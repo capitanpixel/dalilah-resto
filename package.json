@@ -1,0 +1,29 @@
+{
+  "name": "dalilah-resto",
+  "version": "1.0.0",
+  "description": "api para gestionar pedidos de un restaurant",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/capitanpixel/dalilah-resto.git"
+  },
+  "keywords": [
+    "resto",
+    "api"
+  ],
+  "author": "diego seoane",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://gitlab.com/diegoseoane/dalilah-resto/issues"
+  },
+  "homepage": "https://gitlab.com/diegoseoane/dalilah-resto#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "js-yaml": "^4.1.0",
+    "swagger-ui-express": "^4.1.6"
+  }
+}
