@@ -1,7 +1,7 @@
-const { estadoPedidos, listaPedidos } = require('../data/database.js');
+const { Pedido } = require('../database/models/pedidos');
 
 function midModificarPedido(req, res, next) {
-    if (Number(req.body.estado) < 1 || Number(req.body.estado) > estadoPedidos.length) {
+    if (Number(req.body.estado) < 1 || Number(req.body.estado) > 5) {
         res.status(406).json("Estado de pedido inválido");
     } else if (req.body.estado === null || req.body.estado === undefined) {
         res.status(406).json("Ingrese estado del pedido");
@@ -11,7 +11,8 @@ function midModificarPedido(req, res, next) {
 }
 
 function midIdPedido(req, res, next) {
-    if (Number(req.params.idPedido) < 1 || Number(req.params.idPedido) > listaPedidos.length) {
+    const p = Pedido.find();
+    if (Number(req.params.idPedido) < 1 || Number(req.params.idPedido) > p.length) {
         res.status(406).json("Id de pedido inválido");
     } else {
         return next();

@@ -1,4 +1,4 @@
-const { listaProductos } = require("../data/database");
+const { Producto } = require("../database/models/productos");
 
 function midCrearProducto(req, res, next) {
     if (req.body.precio === null || req.body.precio === undefined) {
@@ -15,7 +15,8 @@ function midCrearProducto(req, res, next) {
 } 
 
 function midIdProducto(req, res, next) {
-    if (Number(req.params.idProducto) < 1 || Number(req.params.idProducto) > listaProductos.length) {
+    const p = Producto.find();
+    if (Number(req.params.idProducto) < 1 || Number(req.params.idProducto) > p.length) {
         res.status(406).json("Id de producto inválido");
     } else {
         return next();
