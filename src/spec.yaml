@@ -7,8 +7,6 @@ servers:
   - url: http://localhost:3000/api/v1
     description: development server
 tags:
-  - name: "auth"
-    description: operaciones de autenticación
   - name: "usuarios"
     description: operaciones de los usuarios
   - name: "pedidos"
@@ -21,7 +19,7 @@ paths:
   /login:
     post:
       tags:
-      - "auth"
+      - "usuarios"
       summary: Login
       requestBody:
         required: true
@@ -30,7 +28,7 @@ paths:
             schema:
               type: object
               properties:
-                username:
+                nombreUsuario:
                   type: string
                 password:
                   type: string
@@ -43,7 +41,7 @@ paths:
   /register:
     post:
       tags:
-      - "auth"
+      - "usuarios"
       summary: Registrar un usuario
       requestBody:
         required: true
@@ -77,7 +75,7 @@ paths:
       - "usuarios"
       summary: Listado de todos los usuarios
       parameters:
-        - name: userid
+        - name: usuarioId
           in: header
           required: true
           description: Id del usuario
@@ -91,13 +89,41 @@ paths:
           description: Ok
         '405':
           description: Elemento Invalido
+  /usuarios/{idUsuario}:
+    get:
+      tags:
+      - "usuarios"
+      summary: Listado del historial del usuario
+      parameters:
+        - name: usuarioId
+          in: header
+          required: true
+          description: Id del usuario
+          schema:
+            type : integer
+            format: int64
+            minimum: 1
+        - name: idUsuario
+          in: path
+          required: true
+          description: Id del usuario
+          schema:
+            type : integer
+            format: int64
+            minimum: 1
+      description: Muestra historial del usuario
+      responses:
+        '200':
+          description: Ok
+        '405':
+          description: Elemento Invalido
   /pedidos:
     get:
       tags:
       - "pedidos"
       summary: Listado de todos los pedidos
       parameters:
-        - name: userid
+        - name: usuarioId
           in: header
           required: true
           description: Id del usuario
@@ -116,7 +142,7 @@ paths:
       - "pedidos"
       summary: Crear Pedido
       parameters:
-        - name: userid
+        - name: usuarioId
           in: header
           required: true
           description: Id del usuario
@@ -130,33 +156,13 @@ paths:
           description: Ok
         '405':
           description: Elemento Invalido
-  /pedidos/historial:
-    get:
-      tags:
-      - "pedidos"
-      summary: Listado del historial de pedidos de un usuario
-      parameters:
-        - name: userid
-          in: header
-          required: true
-          description: Id del usuario
-          schema:
-            type : integer
-            format: int64
-            minimum: 1
-      description: Muestra el listado del historial
-      responses:
-        '200':
-          description: Ok
-        '405':
-          description: Elemento Invalido
   /pedidos/{idPedido}:
     post:
       tags:
       - "pedidos"
       summary: Pagar Pedido
       parameters:
-        - name: userid
+        - name: usuarioId
           in: header
           required: true
           description: Id del usuario
@@ -181,8 +187,6 @@ paths:
               properties:
                 metodoPago:
                   type : integer
-                  format: int64
-                  minimum: 1
       description: Paga un pedido del perfil del usuario
       responses:
         '200':
@@ -194,7 +198,7 @@ paths:
       - "pedidos"
       summary: Modificar Pedido
       parameters:
-        - name: userid
+        - name: usuarioId
           in: header
           required: true
           description: Id del usuario
@@ -232,7 +236,7 @@ paths:
         - "pedidos"
         summary: Eliminar Pedido
         parameters:
-          - name: userid
+          - name: usuarioId
             in: header
             required: true
             description: Id del usuario
@@ -254,141 +258,13 @@ paths:
             description: Ok
           '405':
             description: Elemento Invalido
-  /productos:
-    get:
-      tags:
-      - "productos"
-      summary: Listado de todos los productos
-      parameters:
-        - name: userid
-          in: header
-          required: true
-          description: Id del usuario
-          schema:
-            type : integer
-            format: int64
-            minimum: 1
-      description: Muestra todos los productos disponibles
-      responses:
-        '200':
-          description: Ok
-        '405':
-          description: Elemento Invalido
-    post:
-        tags:
-        - "productos"
-        summary: Crear producto
-        parameters:
-          - name: userid
-            in: header
-            required: true
-            description: Id del usuario
-            schema:
-              type : integer
-              format: int64
-              minimum: 1
-        requestBody:
-          required: true
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  precio:
-                    type : integer
-                    format: int64
-                    minimum: 1
-                  nombre:
-                    type: string
-                  descripcion:
-                    type: string
-                  img:
-                    type: string
-        description: Crea un producto
-        responses:
-          '200':
-            description: Ok
-          '405':
-            description: Elemento Invalido
-  /productos/{idProducto}:  
-    put:
-        tags:
-        - "productos"
-        summary: Modificar producto
-        parameters:
-          - name: userid
-            in: header
-            required: true
-            description: Id del usuario
-            schema:
-              type : integer
-              format: int64
-              minimum: 1
-          - name: idProducto
-            in: path
-            required: true
-            description: Id del producto
-            schema:
-              type : integer
-              format: int64
-              minimum: 1
-        requestBody:
-          required: true
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  precio:
-                    type : integer
-                    format: int64
-                    minimum: 1
-                  nombre:
-                    type: string
-                  descripcion:
-                    type: string
-                  img:
-                    type: string
-        description: Modifica un producto
-        responses:
-          '200':
-            description: Ok
-          '405':
-            description: Elemento Invalido
-    delete:
-        tags:
-        - "productos"
-        summary: Eliminar producto
-        parameters:
-          - name: userid
-            in: header
-            required: true
-            description: Id del usuario
-            schema:
-              type : integer
-              format: int64
-              minimum: 1
-          - name: idProducto
-            in: path
-            required: true
-            description: Id del producto
-            schema:
-              type : integer
-              format: int64
-              minimum: 1
-        description: Elimina un producto
-        responses:
-          '200':
-            description: Ok
-          '405':
-            description: Elemento Invalido
-  /productos/{idPedido}/{idProducto}:
+  /pedidos/{idPedido}/{idProducto}:
     post:
       tags:
-        - "productos"
+        - "pedidos"
       summary: Agrega un producto al pedido
       parameters:
-        - name: userid
+        - name: usuarioId
           in: header
           required: true
           description: Id del usuario
@@ -420,10 +296,10 @@ paths:
           description: Elemento Invalido
     delete:
       tags:
-        - "productos"
+        - "pedidos"
       summary: Elimina un producto del pedido
       parameters:
-        - name: userid
+        - name: usuarioId
           in: header
           required: true
           description: Id del usuario
@@ -453,13 +329,137 @@ paths:
           description: Ok
         '405':
           description: Elemento Invalido
+  /productos:
+    get:
+      tags:
+      - "productos"
+      summary: Listado de todos los productos
+      parameters:
+        - name: usuarioId
+          in: header
+          required: true
+          description: Id del usuario
+          schema:
+            type : integer
+            format: int64
+            minimum: 1
+      description: Muestra todos los productos disponibles
+      responses:
+        '200':
+          description: Ok
+        '405':
+          description: Elemento Invalido
+    post:
+        tags:
+        - "productos"
+        summary: Crear producto
+        parameters:
+          - name: usuarioId
+            in: header
+            required: true
+            description: Id del usuario
+            schema:
+              type : integer
+              format: int64
+              minimum: 1
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  precio:
+                    type : integer
+                    format: int64
+                    minimum: 1
+                  nombre:
+                    type: string
+                  descripcion:
+                    type: string
+        description: Crea un producto
+        responses:
+          '200':
+            description: Ok
+          '405':
+            description: Elemento Invalido
+  /productos/{idProducto}:  
+    put:
+        tags:
+        - "productos"
+        summary: Modificar producto
+        parameters:
+          - name: usuarioId
+            in: header
+            required: true
+            description: Id del usuario
+            schema:
+              type : integer
+              format: int64
+              minimum: 1
+          - name: idProducto
+            in: path
+            required: true
+            description: Id del producto
+            schema:
+              type : integer
+              format: int64
+              minimum: 1
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  precio:
+                    type : integer
+                    format: int64
+                    minimum: 1
+                  nombre:
+                    type: string
+                  descripcion:
+                    type: string
+        description: Modifica un producto
+        responses:
+          '200':
+            description: Ok
+          '405':
+            description: Elemento Invalido
+    delete:
+        tags:
+        - "productos"
+        summary: Eliminar producto
+        parameters:
+          - name: usuarioID
+            in: header
+            required: true
+            description: Id del usuario
+            schema:
+              type : integer
+              format: int64
+              minimum: 1
+          - name: idProducto
+            in: path
+            required: true
+            description: Id del producto
+            schema:
+              type : integer
+              format: int64
+              minimum: 1
+        description: Elimina un producto
+        responses:
+          '200':
+            description: Ok
+          '405':
+            description: Elemento Invalido
   /mediosdepago:
     get:
       tags:
       - "pagos"
       summary: Listado de todos los medios de pago
       parameters:
-        - name: userid
+        - name: usuarioId
           in: header
           required: true
           description: Id del usuario
@@ -478,7 +478,7 @@ paths:
       - "pagos"
       summary: Crea un nuevo medio de pago
       parameters:
-        - name: userid
+        - name: usuarioId
           in: header
           required: true
           description: Id del usuario
@@ -501,13 +501,13 @@ paths:
           description: Ok
         '405':
           description: Elemento Invalido
-  /mediosdepago/{idMedioPago}:  
+  /mediosdepago/{idPago}:  
     delete:
       tags:
       - "pagos"
       summary: Elimina un medio de pago
       parameters:
-        - name: userid
+        - name: usuarioId
           in: header
           required: true
           description: Id del usuario
@@ -515,7 +515,7 @@ paths:
             type : integer
             format: int64
             minimum: 1
-        - name: idMedioPago
+        - name: idPago
           in: path
           required: true
           description: Id del medio de pago
@@ -534,7 +534,7 @@ paths:
       - "pagos"
       summary: Modifica un medio de pago
       parameters:
-        - name: userid
+        - name: usuarioId
           in: header
           required: true
           description: Id del usuario
@@ -542,7 +542,7 @@ paths:
             type : integer
             format: int64
             minimum: 1
-        - name: idMedioPago
+        - name: idPago
           in: path
           required: true
           description: Id del medio de pago

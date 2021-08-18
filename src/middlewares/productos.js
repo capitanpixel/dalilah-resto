@@ -7,16 +7,13 @@ function midCrearProducto(req, res, next) {
         res.status(406).json("Nombre inválido");
     } else if (req.body.descripcion === null || req.body.descripcion === undefined) {
         res.status(406).json("Descripción inválida");
-    } else if (req.body.img === null || req.body.img === undefined) {
-        res.status(406).json("Imagen inválida");
     } else {
         return next();
     }
 } 
 
 function midIdProducto(req, res, next) {
-    const p = Producto.find();
-    if (Number(req.params.idProducto) < 1 || Number(req.params.idProducto) > p.length) {
+    if (Number(req.params.idProducto) < 1) {
         res.status(406).json("Id de producto inválido");
     } else {
         return next();

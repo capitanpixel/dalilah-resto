@@ -1,27 +1,9 @@
 const express = require("express");
-const routerUsuarios = express();
 const { Usuario } = require("../database/models/usuarios");
-const { authLogin, authRegistro } = require("../middlewares/usuarios");
+const { authLogin, authRegistro, authAdmin, midLogin } = require("../middlewares/usuarios");
+const routerUsuarios = express();
 
-routerUsuarios.get("/usuarios", async (req, res) => {
-    try {
-        const u = await Usuario.find();
-        res.status(200).json(u);
-    } catch(error) {
-        console.log(error);
-        res.status(404).json(`Error al cargar los usuarios`);
-    }
-})
-
-routerUsuarios.get("/usuarios/:idUsuario", async (req, res) => {
-    try {
-        const p = Pedidos.find({ usuarioId: req.params.idUsuario});
-        res.status(200).json(p)
-    } catch {
-        res.status(404).json(`No se ha podido cargar el historial del usuario`)
-    }
-})
-
+// registrar usuario
 routerUsuarios.post("/register", authRegistro, async (req, res) => {
     try {
         const u = await Usuario.find();
@@ -46,7 +28,7 @@ routerUsuarios.post("/register", authRegistro, async (req, res) => {
         res.status(404).json(`Error al registrar usuario`);
     }
 })
-
+// login usuario
 routerUsuarios.post("/login", authLogin, async (req, res) => {
     try {
         const u = await Usuario.findOne({ nombreUsuario: req.body.nombreUsuario });
@@ -64,12 +46,25 @@ routerUsuarios.post("/login", authLogin, async (req, res) => {
 
 })
 
-routerUsuarios.delete("/usuarios/:idUsuario", async (req, res) => {
+routerUsuarios.use("/", midLogin);
+// ver usuarios
+routerUsuarios.get("/usuarios", authAdmin, async (req, res) => {
     try {
-        const u = await Usuario.deleteOne({ id: req.params.idUsuario });
-        res.status(200).json(`Usuario eliminado`);
+        const u = await Usuario.find();
+        res.status(200).json(u);
+    } catch(error) {
+        console.log(error);
+        res.status(404).json(`Error al cargar los usuarios`);
+    }
+})
+// ver historial del usuario
+routerUsuarios.get("/usuarios/:idUsuario", async (req, res) => {
+    try {
+        const usuarioId = Number(req.params.idUsuario);
+        const p = Pedidos.find({ usuarioId: usuarioId });
+        res.status(200).json(p)
     } catch {
-        res.status(404).json(`Error al eliminar usuario`);
+        res.status(404).json(`No se ha podido cargar el historial del usuario`)
     }
 })
 

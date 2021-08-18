@@ -20,11 +20,11 @@ router.post("/register", authRegistro, registrarUsuario);
 router.use("/", midLogin);
 
 //usuarios
+router.get("/pedidos/historial", verHistorial);
 router.get("/usuarios", authAdmin, verUsuarios);
 //pedidos
 router.get("/pedidos", authAdmin, listarPedidos);
 router.post("/pedidos", crearPedido); 
-router.get("/pedidos/historial", verHistorial);
 router.post("/pedidos/:idPedido", midMetodoPago, pagarPedido); 
 router.put("/pedidos/:idPedido", authAdmin, midIdPedido, midModificarPedido, modificarPedido); 
 router.delete("/pedidos/:idPedido", authAdmin, midIdPedido, eliminarPedido); 

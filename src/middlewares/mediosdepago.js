@@ -20,7 +20,8 @@ function midMetodoPago(req, res, next) {
 }
 
 function midIdPago(req, res, next) {
-    if (Number(req.params.idMedioPago) < 1 || Number(req.params.idMedioPago) > p.length) {
+    const p = Pago.find();
+    if (Number(req.params.idPago) < 1 || Number(req.params.idPago) > p.length) {
         res.status(406).json("Id de medio de pago inválido");
     } else {
         return next();

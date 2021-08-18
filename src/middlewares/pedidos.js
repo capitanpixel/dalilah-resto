@@ -11,8 +11,7 @@ function midModificarPedido(req, res, next) {
 }
 
 function midIdPedido(req, res, next) {
-    const p = Pedido.find();
-    if (Number(req.params.idPedido) < 1 || Number(req.params.idPedido) > p.length) {
+    if (Number(req.params.idPedido) < 1) {
         res.status(406).json("Id de pedido inválido");
     } else {
         return next();

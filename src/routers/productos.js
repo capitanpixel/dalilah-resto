@@ -1,7 +1,9 @@
 const express = require("express");
 const routerProductos = express();
 const { Producto } = require("../database/models/productos");
-
+const { midCrearProducto, midIdProducto } = require("../middlewares/productos");
+const { authAdmin } = require("../middlewares/usuarios");
+// ver productos
 routerProductos.get("/productos", async (req, res) => {
     try {
         const p = await Producto.find();
@@ -11,7 +13,9 @@ routerProductos.get("/productos", async (req, res) => {
     }
 })
 
-routerProductos.post("/productos", async (req, res) => {
+routerProductos.use("/", authAdmin);
+// crear productos
+routerProductos.post("/productos", midCrearProducto, async (req, res) => {
     try {
         const p = await Producto.find();
         const nuevoProducto = new Producto();
@@ -29,10 +33,11 @@ routerProductos.post("/productos", async (req, res) => {
         console.log(error);
     }
 })
-
-routerProductos.put("/productos/:idProducto", async (req, res) => {
+// modificar producto
+routerProductos.put("/productos/:idProducto", midCrearProducto, async (req, res) => {
     try {
-        const p = await Producto.findOne({ id: req.params.idProducto });
+        const idProducto = Number(req.params.idProducto);
+        const p = await Producto.findOne({ id: idProducto });
         p.precio = req.body.precio;
         p.descripcion = req.body.descripcion;
         p.save();
@@ -41,10 +46,11 @@ routerProductos.put("/productos/:idProducto", async (req, res) => {
         res.status(404).json(`No se pudo modificar el producto`);
     }
 })
-
-routerProductos.delete("/productos/:idProducto", async (req, res) => {
+// eliminar producto
+routerProductos.delete("/productos/:idProducto", midIdProducto, async (req, res) => {
     try {
-        const p = await Producto.deleteOne({ id: req.params.idProducto });
+        const idProducto = Number(req.params.idProducto);
+        const p = await Producto.deleteOne({ id: idProducto });
         res.status(200).json(`El producto ha sido eliminado`);
     } catch {
         res.status(404).json(`No se ha podido eliminar el producto`);
