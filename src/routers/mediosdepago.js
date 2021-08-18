@@ -34,7 +34,6 @@ routerPagos.post("/mediosdepago", midCrearMedioPago, async (req, res) => {
 })
 // modificar medio de pago
 routerPagos.put("/mediosdepago/:idPago", midIdPago, midCrearMedioPago, async (req, res) => {
-
     try {
         const idPago = Number(req.params.idPago);
         const p = await Pago.findOne({ id: idPago });

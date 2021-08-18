@@ -23,7 +23,7 @@ routerPedidos.post("/pedidos", async (req, res) => {
         nuevoPedido.estado = 1;
         nuevoPedido.hora = new Date();
         nuevoPedido.descripcion = [];
-        nuevoPedido.usuarioId = req.headers.usuarioId;
+        nuevoPedido.usuarioId = Number(req.headers.usuarioId);
         nuevoPedido.montoPago = 0;
         await nuevoPedido.save();
         res.status(200).json(`Pedido guardado`);
@@ -35,10 +35,10 @@ routerPedidos.post("/pedidos", async (req, res) => {
 
 routerPedidos.post("/pedidos/:idPedido", midMetodoPago, async (req, res) => {
     try {
-        const idUsuario = Number(req.headers.usuarioId);
+        //const idUsuario = req.headers.usuarioId;
         const idPedido = Number(req.params.idPedido);
         const p = await Pedido.findOne({ id: idPedido });
-        const u = await Usuario.findOne({ id: idUsuario });
+        const u = await Usuario.findOne({ id: req.headers.usuarioId });
         const m = await Pago.findOne({ id: req.body.metodoPago});
         if (p.estado = 1) {
             p.metodoPago = m.nombre;
