@@ -14,6 +14,7 @@ routerPedidos.post("/pedidos", async (req, res) => {
     try {
         const p = await Pedido.find();
         const nuevoPedido = new Pedido();
+        //const idUsuario = Number(req.headers.usuarioId);
         if (p.length === 0) {
             nuevoPedido.id = 1;
         } else {
