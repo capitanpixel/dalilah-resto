@@ -12,11 +12,16 @@ function midCrearProducto(req, res, next) {
     }
 } 
 
-function midIdProducto(req, res, next) {
-    if (Number(req.params.idProducto) < 1) {
-        res.status(406).json("Id de producto inválido");
-    } else {
-        return next();
+async function midIdProducto(req, res, next) {
+    try {
+        const p = await Producto.find();
+        if (Number(req.params.idProducto) < 1 || Number(req.params.idProducto) > p.length) {
+            res.status(406).json("Id de producto inválido");
+        } else {
+            return next();
+        }
+    } catch {
+        res.status(404).json(`Se produjo un error`);
     }
 }
 

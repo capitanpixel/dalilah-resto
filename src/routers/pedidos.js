@@ -4,17 +4,16 @@ const { Pedido } = require("../database/models/pedidos");
 const { Producto } = require("../database/models/productos");
 const { Usuario } = require("../database/models/usuarios");
 const { midMetodoPago } = require("../middlewares/mediosdepago");
-const { midIdPedido, midModificarPedido } = require("../middlewares/pedidos");
+const { midIdPedido, midModificarPedido, midUsuarioPedido } = require("../middlewares/pedidos");
 const { midIdProducto } = require("../middlewares/productos");
-const { authAdmin } = require("../middlewares/usuarios");
+const { authAdmin, midLogin } = require("../middlewares/usuarios");
 const routerPedidos = express();
 
-
-routerPedidos.post("/pedidos", async (req, res) => {
+// crear pedido
+routerPedidos.post("/pedidos", midLogin, async (req, res) => {
     try {
         const p = await Pedido.find();
         const nuevoPedido = new Pedido();
-        //const idUsuario = Number(req.headers.usuarioId);
         if (p.length === 0) {
             nuevoPedido.id = 1;
         } else {
@@ -23,7 +22,7 @@ routerPedidos.post("/pedidos", async (req, res) => {
         nuevoPedido.estado = 1;
         nuevoPedido.hora = new Date();
         nuevoPedido.descripcion = [];
-        nuevoPedido.usuarioId = Number(req.headers.usuarioId);
+        nuevoPedido.usuarioId = Number(req.headers.userid);
         nuevoPedido.montoPago = 0;
         await nuevoPedido.save();
         res.status(200).json(`Pedido guardado`);
@@ -32,15 +31,15 @@ routerPedidos.post("/pedidos", async (req, res) => {
         res.status(401).json(`El pedido no ha podido guardarse`);
     }
 })
-
-routerPedidos.post("/pedidos/:idPedido", midMetodoPago, async (req, res) => {
+// pagar pedido
+routerPedidos.post("/pedidos/:idPedido", midLogin, midMetodoPago, midUsuarioPedido, async (req, res) => {
     try {
-        //const idUsuario = req.headers.usuarioId;
+        const idUsuario = Number(req.headers.userid);
         const idPedido = Number(req.params.idPedido);
         const p = await Pedido.findOne({ id: idPedido });
-        const u = await Usuario.findOne({ id: req.headers.usuarioId });
+        const u = await Usuario.findOne({ id: idUsuario });
         const m = await Pago.findOne({ id: req.body.metodoPago});
-        if (p.estado = 1) {
+        if (p.estado === 1) {
             p.metodoPago = m.nombre;
             p.direccion = u.direccion;
             p.estado = 2;
@@ -54,14 +53,14 @@ routerPedidos.post("/pedidos/:idPedido", midMetodoPago, async (req, res) => {
         res.status(404).json(`El pedido no ha podido ser abonado`);
     }
 })
-
-routerPedidos.post("/pedidos/:idPedido/:idProducto", midIdPedido, midIdProducto, async (req, res) => {
+// agregar pedido al producto
+routerPedidos.post("/pedidos/:idPedido/:idProducto", midLogin, midIdPedido, midIdProducto, midUsuarioPedido, async (req, res) => {
     try {
-        const usuarioId = Number(req.headers.usuarioId);
+        const usuarioId = Number(req.headers.userid);
         const idPedido = Number(req.params.idPedido);
         const pedido = await Pedido.findOne({ id: idPedido }).exec();
         if (usuarioId === pedido.usuarioId) {
-            if (pedido.estado = 1) {
+            if (pedido.estado === 1) {
                 const idProducto = Number(req.params.idProducto);
                 const producto = await Producto.findOne({ id: idProducto }).exec();
                 pedido.descripcion.push(producto);
@@ -79,12 +78,12 @@ routerPedidos.post("/pedidos/:idPedido/:idProducto", midIdPedido, midIdProducto,
         res.status(404).json(`No se pudo agregar el producto`);
     }
 })
-
-routerPedidos.delete("/pedidos/:idPedido/:idProducto", midIdPedido, midIdProducto, async (req, res) => {
+// quitar producto del pedido
+routerPedidos.delete("/pedidos/:idPedido/:idProducto", midLogin, midIdPedido, midIdProducto, midUsuarioPedido, async (req, res) => {
     try {
         const idPedido = Number(req.params.idPedido);
         const pedido = await Pedido.findOne({ id: idPedido }).exec();
-        if (pedido.estado = 1) {
+        if (pedido.estado === 1) {
             const idProducto = Number(req.params.idProducto);
             const producto = await Producto.findOne({ id: idProducto }).exec();
             let productoIndex = pedido.descripcion.indexOf(producto);
@@ -100,9 +99,9 @@ routerPedidos.delete("/pedidos/:idPedido/:idProducto", midIdPedido, midIdProduct
     }
 })
 
-routerPedidos.use("/", authAdmin);
-
-routerPedidos.get("/pedidos", async (req, res) => {
+//routerPedidos.use("/", authAdmin);
+// ver pedidos
+routerPedidos.get("/pedidos", authAdmin, midLogin, async (req, res) => {
     try {
         const p = await Pedido.find();
         res.status(200).json(p);
@@ -110,8 +109,8 @@ routerPedidos.get("/pedidos", async (req, res) => {
         res.status(404).json(`No pudieron cargarse los pedidos`);
     }
 })
-
-routerPedidos.put("/pedidos/:idPedido", midIdPedido, midModificarPedido, async (req, res) => {
+//modificar pedido
+routerPedidos.put("/pedidos/:idPedido", authAdmin, midLogin, midIdPedido, midModificarPedido, async (req, res) => {
     try {
         const idPedido = Number(req.params.idPedido);
         const p = await Pedido.findOne({ id: idPedido }).exec();
@@ -122,8 +121,8 @@ routerPedidos.put("/pedidos/:idPedido", midIdPedido, midModificarPedido, async (
         res.status(404).json(`El pedido no ha podido modificarse`);
     }
 })
-
-routerPedidos.delete("/pedidos/:idPedido", midIdPedido, async (req, res) => {
+// eliminar pedido
+routerPedidos.delete("/pedidos/:idPedido", authAdmin, midLogin, midIdPedido, async (req, res) => {
     try {
         const idPedido = Number(req.params.idPedido);
         const p = await Pedido.deleteOne({ id: idPedido });

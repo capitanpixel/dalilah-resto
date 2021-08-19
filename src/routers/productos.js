@@ -13,9 +13,9 @@ routerProductos.get("/productos", async (req, res) => {
     }
 })
 
-routerProductos.use("/", authAdmin);
+//routerProductos.use("/", authAdmin);
 // crear productos
-routerProductos.post("/productos", midCrearProducto, async (req, res) => {
+routerProductos.post("/productos", authAdmin, midCrearProducto, async (req, res) => {
     try {
         const p = await Producto.find();
         const nuevoProducto = new Producto();
@@ -34,7 +34,7 @@ routerProductos.post("/productos", midCrearProducto, async (req, res) => {
     }
 })
 // modificar producto
-routerProductos.put("/productos/:idProducto", midCrearProducto, async (req, res) => {
+routerProductos.put("/productos/:idProducto", authAdmin, midCrearProducto, async (req, res) => {
     try {
         const idProducto = Number(req.params.idProducto);
         const p = await Producto.findOne({ id: idProducto });
@@ -47,7 +47,7 @@ routerProductos.put("/productos/:idProducto", midCrearProducto, async (req, res)
     }
 })
 // eliminar producto
-routerProductos.delete("/productos/:idProducto", midIdProducto, async (req, res) => {
+routerProductos.delete("/productos/:idProducto", authAdmin, midIdProducto, async (req, res) => {
     try {
         const idProducto = Number(req.params.idProducto);
         const p = await Producto.deleteOne({ id: idProducto });

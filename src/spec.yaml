@@ -75,7 +75,7 @@ paths:
       - "usuarios"
       summary: Listado de todos los usuarios
       parameters:
-        - name: usuarioId
+        - name: userid
           in: header
           required: true
           description: Id del usuario
@@ -95,7 +95,7 @@ paths:
       - "usuarios"
       summary: Listado del historial del usuario
       parameters:
-        - name: usuarioId
+        - name: userid
           in: header
           required: true
           description: Id del usuario
@@ -123,7 +123,7 @@ paths:
       - "pedidos"
       summary: Listado de todos los pedidos
       parameters:
-        - name: usuarioId
+        - name: userid
           in: header
           required: true
           description: Id del usuario
@@ -142,7 +142,7 @@ paths:
       - "pedidos"
       summary: Crear Pedido
       parameters:
-        - name: usuarioId
+        - name: userid
           in: header
           required: true
           description: Id del usuario
@@ -162,7 +162,7 @@ paths:
       - "pedidos"
       summary: Pagar Pedido
       parameters:
-        - name: usuarioId
+        - name: userid
           in: header
           required: true
           description: Id del usuario
@@ -198,7 +198,7 @@ paths:
       - "pedidos"
       summary: Modificar Pedido
       parameters:
-        - name: usuarioId
+        - name: userid
           in: header
           required: true
           description: Id del usuario
@@ -236,7 +236,7 @@ paths:
         - "pedidos"
         summary: Eliminar Pedido
         parameters:
-          - name: usuarioId
+          - name: userid
             in: header
             required: true
             description: Id del usuario
@@ -264,7 +264,7 @@ paths:
         - "pedidos"
       summary: Agrega un producto al pedido
       parameters:
-        - name: usuarioId
+        - name: userid
           in: header
           required: true
           description: Id del usuario
@@ -299,7 +299,7 @@ paths:
         - "pedidos"
       summary: Elimina un producto del pedido
       parameters:
-        - name: usuarioId
+        - name: userid
           in: header
           required: true
           description: Id del usuario
@@ -335,7 +335,7 @@ paths:
       - "productos"
       summary: Listado de todos los productos
       parameters:
-        - name: usuarioId
+        - name: userid
           in: header
           required: true
           description: Id del usuario
@@ -354,7 +354,7 @@ paths:
         - "productos"
         summary: Crear producto
         parameters:
-          - name: usuarioId
+          - name: userid
             in: header
             required: true
             description: Id del usuario
@@ -389,7 +389,7 @@ paths:
         - "productos"
         summary: Modificar producto
         parameters:
-          - name: usuarioId
+          - name: userid
             in: header
             required: true
             description: Id del usuario
@@ -431,7 +431,7 @@ paths:
         - "productos"
         summary: Eliminar producto
         parameters:
-          - name: usuarioID
+          - name: userid
             in: header
             required: true
             description: Id del usuario
@@ -459,7 +459,7 @@ paths:
       - "pagos"
       summary: Listado de todos los medios de pago
       parameters:
-        - name: usuarioId
+        - name: userid
           in: header
           required: true
           description: Id del usuario
@@ -478,7 +478,7 @@ paths:
       - "pagos"
       summary: Crea un nuevo medio de pago
       parameters:
-        - name: usuarioId
+        - name: userid
           in: header
           required: true
           description: Id del usuario
@@ -507,7 +507,7 @@ paths:
       - "pagos"
       summary: Elimina un medio de pago
       parameters:
-        - name: usuarioId
+        - name: userid
           in: header
           required: true
           description: Id del usuario
@@ -534,7 +534,7 @@ paths:
       - "pagos"
       summary: Modifica un medio de pago
       parameters:
-        - name: usuarioId
+        - name: userid
           in: header
           required: true
           description: Id del usuario

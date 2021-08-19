@@ -1,5 +1,6 @@
 const express = require("express");
 const { Usuario } = require("../database/models/usuarios");
+const { Pedido } = require("../database/models/pedidos")
 const { authLogin, authRegistro, authAdmin, midLogin } = require("../middlewares/usuarios");
 const routerUsuarios = express();
 
@@ -46,9 +47,9 @@ routerUsuarios.post("/login", authLogin, async (req, res) => {
 
 })
 
-routerUsuarios.use("/", midLogin);
+//routerUsuarios.use("/", midLogin);
 // ver usuarios
-routerUsuarios.get("/usuarios", authAdmin, async (req, res) => {
+routerUsuarios.get("/usuarios", midLogin, authAdmin, async (req, res) => {
     try {
         const u = await Usuario.find();
         res.status(200).json(u);
@@ -58,12 +59,13 @@ routerUsuarios.get("/usuarios", authAdmin, async (req, res) => {
     }
 })
 // ver historial del usuario
-routerUsuarios.get("/usuarios/:idUsuario", async (req, res) => {
+routerUsuarios.get("/usuarios/:idUsuario", midLogin, async (req, res) => {
     try {
         const usuarioId = Number(req.params.idUsuario);
-        const p = Pedidos.find({ usuarioId: usuarioId });
+        const p = await Pedido.find({ usuarioId: usuarioId });
         res.status(200).json(p)
-    } catch {
+    } catch(error) {
+        console.log(error);
         res.status(404).json(`No se ha podido cargar el historial del usuario`)
     }
 })

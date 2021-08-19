@@ -4,9 +4,9 @@ const { midCrearMedioPago, midIdPago } = require("../middlewares/mediosdepago");
 const { authAdmin } = require("../middlewares/usuarios");
 const routerPagos = express();
 
-routerPagos.use("/", authAdmin);
+//routerPagos.use("/", authAdmin);
 // ver medios de pago
-routerPagos.get("/mediosdepago", async (req, res) => {
+routerPagos.get("/mediosdepago", authAdmin, async (req, res) => {
     try {
         const m = await Pago.find();
         res.status(200).json(m);
@@ -15,7 +15,7 @@ routerPagos.get("/mediosdepago", async (req, res) => {
     }
 })
 // crear medio de pago
-routerPagos.post("/mediosdepago", midCrearMedioPago, async (req, res) => {
+routerPagos.post("/mediosdepago", authAdmin, midCrearMedioPago, async (req, res) => {
     try {
         const m = await Pago.find();
         const nuevoPago = await new Pago();
@@ -33,7 +33,7 @@ routerPagos.post("/mediosdepago", midCrearMedioPago, async (req, res) => {
     }
 })
 // modificar medio de pago
-routerPagos.put("/mediosdepago/:idPago", midIdPago, midCrearMedioPago, async (req, res) => {
+routerPagos.put("/mediosdepago/:idPago", authAdmin, midIdPago, midCrearMedioPago, async (req, res) => {
     try {
         const idPago = Number(req.params.idPago);
         const p = await Pago.findOne({ id: idPago });
@@ -45,7 +45,7 @@ routerPagos.put("/mediosdepago/:idPago", midIdPago, midCrearMedioPago, async (re
     }
 })
 // eliminar medio de pago
-routerPagos.delete("/mediosdepago/:idPago", midIdPago, async (req, res) => {
+routerPagos.delete("/mediosdepago/:idPago", authAdmin, midIdPago, async (req, res) => {
     try {
         const idPago = Number(req.params.idPago);
         const m = await Pago.deleteOne({ id: idPago});
