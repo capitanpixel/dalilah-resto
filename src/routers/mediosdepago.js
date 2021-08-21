@@ -39,7 +39,7 @@ routerPagos.put("/mediosdepago/:idPago", authAdmin, midIdPago, midCrearMedioPago
         const p = await Pago.findOne({ id: idPago });
         p.nombre = req.body.nombre;
         await p.save();
-        res.status(200).json(`El medio de pago ha sido modificado`);
+        res.status(200).json(`El medio de pago ${p.nombre} ha sido modificado`);
     } catch {
         res.status(404).json(`Error al modificar medio de pago`);
     }

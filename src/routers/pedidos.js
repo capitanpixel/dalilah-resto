@@ -1,4 +1,6 @@
 const express = require("express");
+const mongoose = require("mongoose");
+const db = mongoose.connection;
 const { Pago } = require("../database/models/mediosdepago");
 const { Pedido } = require("../database/models/pedidos");
 const { Producto } = require("../database/models/productos");
@@ -25,7 +27,7 @@ routerPedidos.post("/pedidos", midLogin, async (req, res) => {
         nuevoPedido.usuarioId = Number(req.headers.userid);
         nuevoPedido.montoPago = 0;
         await nuevoPedido.save();
-        res.status(200).json(`Pedido guardado`);
+        res.status(200).json(`Pedido ${nuevoPedido.id} creado`);
     } catch (error) {
         console.log(error);
         res.status(401).json(`El pedido no ha podido guardarse`);
@@ -34,6 +36,8 @@ routerPedidos.post("/pedidos", midLogin, async (req, res) => {
 // pagar pedido
 routerPedidos.post("/pedidos/:idPedido", midLogin, midMetodoPago, midUsuarioPedido, async (req, res) => {
     try {
+        const session = await db.startSession();
+        session.startTransaction();
         const idUsuario = Number(req.headers.userid);
         const idPedido = Number(req.params.idPedido);
         const p = await Pedido.findOne({ id: idPedido });
@@ -44,18 +48,22 @@ routerPedidos.post("/pedidos/:idPedido", midLogin, midMetodoPago, midUsuarioPedi
             p.direccion = u.direccion;
             p.estado = 2;
             await p.save();
+            await session.commitTransaction();
             res.status(200).json(`El pedido ${p.id} ha sido abonado`);
         } else {
-            res.status(404).json(`El pedido ya ha sido abonado anteriormente.`);
+            await session.abortTransaction();
+            res.status(404).json(`El pedido ${p.id} ya ha sido abonado anteriormente.`);
         }
-    } catch(error) {
-        console.log(error);
+        session.endSession();
+    } catch {
         res.status(404).json(`El pedido no ha podido ser abonado`);
     }
 })
 // agregar pedido al producto
 routerPedidos.post("/pedidos/:idPedido/:idProducto", midLogin, midIdPedido, midIdProducto, midUsuarioPedido, async (req, res) => {
     try {
+        const session = await db.startSession();
+        session.startTransaction();
         const usuarioId = Number(req.headers.userid);
         const idPedido = Number(req.params.idPedido);
         const pedido = await Pedido.findOne({ id: idPedido }).exec();
@@ -66,21 +74,26 @@ routerPedidos.post("/pedidos/:idPedido/:idProducto", midLogin, midIdPedido, midI
                 pedido.descripcion.push(producto);
                 pedido.montoPago += producto.precio;
                 await pedido.save();
-                res.status(200).json(`Producto agregado`);
+                await session.commitTransaction();
+                res.status(200).json(`Producto ${producto.nombre} agregado`);
             } else {
-                res.status(200).json(`El pedido ya ha sido abonado y no puede modificarse`)
+                await session.abortTransaction();
+                res.status(200).json(`El pedido ${pedido.id} ya ha sido abonado y no puede modificarse`)
             }
         } else {
+            await session.abortTransaction();
             res.status(404).json(`El pedido ${pedido.id} no corresponde al usuario ${usuarioId}`);
         }
-    } catch(error) {
-        console.log(error);
+        session.endSession();
+    } catch {
         res.status(404).json(`No se pudo agregar el producto`);
     }
 })
 // quitar producto del pedido
 routerPedidos.delete("/pedidos/:idPedido/:idProducto", midLogin, midIdPedido, midIdProducto, midUsuarioPedido, async (req, res) => {
     try {
+        const session = await db.startSession();
+        session.startTransaction();
         const idPedido = Number(req.params.idPedido);
         const pedido = await Pedido.findOne({ id: idPedido }).exec();
         if (pedido.estado === 1) {
@@ -90,10 +103,13 @@ routerPedidos.delete("/pedidos/:idPedido/:idProducto", midLogin, midIdPedido, mi
             pedido.descripcion.splice(productoIndex, 1);
             pedido.montoPago -= producto.precio;
             await pedido.save();
-            res.status(200).json(`Producto eliminado del pedido`);
+            await session.commitTransaction();
+            res.status(200).json(`Producto ${producto.nombre} eliminado del pedido`);
         } else {
-            res.status(200).json(`El pedido ya ha sido abonado y no puede modificarse`)
+            await session.abortTransaction();
+            res.status(200).json(`El pedido ${pedido.id} ya ha sido abonado y no puede modificarse`)
         }
+        session.endSession();
     } catch {
         res.status(404).json(`No se pudo eliminar el producto`);
     }
@@ -116,9 +132,9 @@ routerPedidos.put("/pedidos/:idPedido", authAdmin, midLogin, midIdPedido, midMod
         const p = await Pedido.findOne({ id: idPedido }).exec();
         p.estado = req.body.estado;
         p.save();
-        res.status(200).json(`El pedido ha sido modificado a estado ${p.estado}`);
+        res.status(200).json(`El pedido ${p.id} ha sido modificado a estado ${p.estado}`);
     } catch {
-        res.status(404).json(`El pedido no ha podido modificarse`);
+        res.status(404).json(`El pedido ${p.id} no ha podido modificarse`);
     }
 })
 // eliminar pedido
@@ -126,7 +142,7 @@ routerPedidos.delete("/pedidos/:idPedido", authAdmin, midLogin, midIdPedido, asy
     try {
         const idPedido = Number(req.params.idPedido);
         const p = await Pedido.deleteOne({ id: idPedido });
-        res.status(200).json(`El pedido ${p.id} ha sido eliminado`);
+        res.status(200).json(`El pedido ha sido eliminado`);
     } catch {
         res.status(404).json(`El pedido no ha podido ser eliminado`);
     }

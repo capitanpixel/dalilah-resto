@@ -28,9 +28,9 @@ routerProductos.post("/productos", authAdmin, midCrearProducto, async (req, res)
         nuevoProducto.precio = req.body.precio;
         nuevoProducto.descripcion = req.body.descripcion;
         await nuevoProducto.save();
-        res.status(200).json(`Producto guardado`);
-    } catch (error) {
-        console.log(error);
+        res.status(200).json(`El producto "${nuevoProducto.nombre}" ha sido creado`);
+    } catch {
+        res.status(404).json(`No se ha podido crear el producto`);
     }
 })
 // modificar producto
@@ -41,7 +41,7 @@ routerProductos.put("/productos/:idProducto", authAdmin, midCrearProducto, async
         p.precio = req.body.precio;
         p.descripcion = req.body.descripcion;
         p.save();
-        res.status(200).json(`El producto ${p.nombre} ha sido modificado`);
+        res.status(200).json(`El producto "${p.nombre}" ha sido modificado`);
     } catch {
         res.status(404).json(`No se pudo modificar el producto`);
     }

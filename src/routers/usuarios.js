@@ -23,7 +23,7 @@ routerUsuarios.post("/register", authRegistro, async (req, res) => {
         nuevoUsuario.login = false;
         nuevoUsuario.isAdmin = false;
         await nuevoUsuario.save();
-        res.status(200).json(`Usuario ${nuevoUsuario.nombreUsuario} registrado con exito`);
+        res.status(200).json(`Usuario "${nuevoUsuario.nombreUsuario}" registrado con exito`);
     } catch(error) {
         console.log(error);
         res.status(404).json(`Error al registrar usuario`);
@@ -36,12 +36,11 @@ routerUsuarios.post("/login", authLogin, async (req, res) => {
         if (u.password === req.body.password) {
             u.login = true;
             await u.save();
-            res.status(200).json(`Logueado con exito`);
+            res.status(200).json(`${u.nombreUsuario}" logueado con exito`);
         } else {
             res.status(404).json(`Contraseña invalida`);
         }
-    } catch(error) {
-        console.log(error);
+    } catch {
         res.status(404).json(`Error al loguearse`);
     }
 
@@ -64,8 +63,7 @@ routerUsuarios.get("/usuarios/:idUsuario", midLogin, async (req, res) => {
         const usuarioId = Number(req.params.idUsuario);
         const p = await Pedido.find({ usuarioId: usuarioId });
         res.status(200).json(p)
-    } catch(error) {
-        console.log(error);
+    } catch {
         res.status(404).json(`No se ha podido cargar el historial del usuario`)
     }
 })
