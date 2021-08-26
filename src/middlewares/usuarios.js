@@ -1,15 +1,36 @@
+const jwt = require('jsonwebtoken');
+const { createHmac } = require('crypto');
 const { Usuario } = require("../database/models/usuarios");
+
+function encript(secret) {
+    return createHmac('sha256', secret).digest('hex');
+}
 
 async function authAdmin(req, res, next) {
     try {
+        const { JWT_SECRET } = process.env;
+        const authHeader = req.headers.authorization || '';
+        const token = authHeader.replace('Bearer ', '');
+        jwt.verify(token, encript(JWT_SECRET), (err, decoded) => {
+            if (err) {
+                console.log(err);
+                res.status(401).send('You are not authorized.   .|.');
+            } else {
+                req.user = decoded;
+                next();
+            }
+        });
+        /*
         const idUsuario = Number(req.headers.userid);
         const u = await Usuario.findOne({ id: idUsuario });
         if (u.isAdmin === true) {
             return next();
         } else {
             res.status(401).json("No es administrador");
+            
         }
-    } catch(error) {
+        */
+    } catch (error) {
         console.log(error);
         res.status(404).json(`Se produjo un error`);
     }
@@ -18,7 +39,7 @@ async function authAdmin(req, res, next) {
 async function authRegistro(req, res, next) {
     try {
         const u = await Usuario.findOne({ email: req.body.email });
-        if (u.length > 0) {
+        if (u) {
             return res.status(406).json("Email ya existente");
         }
         if (req.body.nombreUsuario === null || req.body.nombreUsuario === undefined) {
@@ -37,7 +58,7 @@ async function authRegistro(req, res, next) {
             return next();
         }
 
-    } catch(error) {
+    } catch (error) {
         console.log(error);
         res.status(404).json(`Se produjo un error`);
     }
@@ -63,7 +84,7 @@ async function midLogin(req, res, next) {
             res.status(406).json("Usted debe loguearse");
         }
 
-    } catch(error) {
+    } catch (error) {
         console.log(error);
         res.status(404).json(`Se produjo un error`);
     }
@@ -74,4 +95,5 @@ module.exports = {
     authRegistro,
     authLogin,
     midLogin,
+    encript
 }

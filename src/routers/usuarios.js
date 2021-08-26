@@ -1,16 +1,19 @@
-const express = require("express");
+const { Router } = require("express");
+const jwt = require('jsonwebtoken');
 const { Usuario } = require("../database/models/usuarios");
 const { Pedido } = require("../database/models/pedidos")
-const { authLogin, authRegistro, authAdmin, midLogin } = require("../middlewares/usuarios");
-const routerUsuarios = express();
+const { authLogin, authRegistro, authAdmin, midLogin, encript } = require("../middlewares/usuarios");
 
-// registrar usuario
-routerUsuarios.post("/register", authRegistro, async (req, res) => {
-    try {
-        const u = await Usuario.find();
-        const nuevoUsuario = await new Usuario();
-        if (u.length === 0) {
-            nuevoUsuario.id = 1;
+function makeUsuariosRouter() {
+    const router = Router();
+
+    // registrar usuario
+    router.post("/register", authRegistro, async (req, res) => {
+        try {
+            const u = await Usuario.find();
+            const nuevoUsuario = await new Usuario();
+            if (u.length === 0) {
+                nuevoUsuario.id = 1;
         } else {
             nuevoUsuario.id = u[u.length - 1].id + 1;
         }
@@ -19,46 +22,50 @@ routerUsuarios.post("/register", authRegistro, async (req, res) => {
         nuevoUsuario.direccion = req.body.direccion;
         nuevoUsuario.telefono = req.body.telefono;
         nuevoUsuario.email = req.body.email,
-        nuevoUsuario.password = req.body.password;
+        nuevoUsuario.password = encript(req.body.password);
         nuevoUsuario.login = false;
-        nuevoUsuario.isAdmin = false;
+        nuevoUsuario.isAdmin = true;
         await nuevoUsuario.save();
-        res.status(200).json(`Usuario "${nuevoUsuario.nombreUsuario}" registrado con exito`);
-    } catch(error) {
+        res.status(200).json(`Usuario ${nuevoUsuario.nombreUsuario} registrado con exito`);
+    } catch (error) {
         console.log(error);
         res.status(404).json(`Error al registrar usuario`);
     }
 })
 // login usuario
-routerUsuarios.post("/login", authLogin, async (req, res) => {
+router.post("/login", authLogin, async (req, res) => {
     try {
         const u = await Usuario.findOne({ nombreUsuario: req.body.nombreUsuario });
-        if (u.password === req.body.password) {
+        if (u.password === encript(req.body.password)) {
+            const token = jwt.sign({ nombreUsuario: u.nombreUsuario }, u.password);
             u.login = true;
             await u.save();
-            res.status(200).json(`${u.nombreUsuario}" logueado con exito`);
+            res.status(200).json({
+                Usuario: u.nombreUsuario,
+                Token: token
+            })
         } else {
             res.status(404).json(`Contraseña invalida`);
         }
-    } catch {
+    } catch (error) {
+        console.log(error);
         res.status(404).json(`Error al loguearse`);
     }
-
+    
 })
 
-//routerUsuarios.use("/", midLogin);
 // ver usuarios
-routerUsuarios.get("/usuarios", midLogin, authAdmin, async (req, res) => {
+router.get("/usuarios", midLogin, authAdmin, async (req, res) => {
     try {
         const u = await Usuario.find();
         res.status(200).json(u);
-    } catch(error) {
+    } catch (error) {
         console.log(error);
         res.status(404).json(`Error al cargar los usuarios`);
     }
 })
 // ver historial del usuario
-routerUsuarios.get("/usuarios/:idUsuario", midLogin, async (req, res) => {
+router.get("/usuarios/:idUsuario", midLogin, async (req, res) => {
     try {
         const usuarioId = Number(req.params.idUsuario);
         const p = await Pedido.find({ usuarioId: usuarioId });
@@ -67,7 +74,9 @@ routerUsuarios.get("/usuarios/:idUsuario", midLogin, async (req, res) => {
         res.status(404).json(`No se ha podido cargar el historial del usuario`)
     }
 })
+return router
+}
 
 module.exports = {
-    routerUsuarios
+    makeUsuariosRouter
 }

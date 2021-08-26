@@ -29,25 +29,7 @@ async function midIdPedido(req, res, next) {
     }
 }
 
-async function midUsuarioPedido(req, res, next) {
-    try {
-        const idPedido = Number(req.params.idPedido);
-        const idUsuario = Number(req.headers.userid);
-        const p = await Pedido.findOne({ id: idPedido });
-        const u = await Usuario.findOne({ id: idUsuario })
-        if (p.usuarioId === idUsuario) {
-            return next()
-        } else {
-            res.status(404).json(`El pedido ${p.id} no corresponde al usuario ${u.nombreUsuario}`);
-        }
-    } catch(error) {
-        console.log(error);
-        res.status(404).json(`Se produjo un error`);
-    }
-}
-
 module.exports = {
     midModificarPedido,
-    midIdPedido,
-    midUsuarioPedido
+    midIdPedido
 }
