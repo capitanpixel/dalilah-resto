@@ -1,11 +1,9 @@
 const { Router } = require("express");
-const { midCrearMedioPago, midIdPago } = require("../middlewares/mediosdepago");
-const { authAdmin } = require("../middlewares/usuarios");
+const { authAdmin } = require("../middlewares/middlewares");
 const { Pago } = require("../database/models/mediosdepago");
 
-
-
 function makePagosRouter() {
+    
     const router = Router();
 
     // ver medios de pago
@@ -17,47 +15,67 @@ function makePagosRouter() {
             res.status(404).json(`Error al cargar los medios de pago`);
         }
     })
+
     // crear medio de pago
-    router.post("/mediosdepago", authAdmin, midCrearMedioPago, async (req, res) => {
+    router.post("/mediosdepago", authAdmin, async (req, res) => {
         try {
-            const m = await Pago.find();
-            const nuevoPago = await new Pago();
-            if (m.length === 0) {
-                nuevoPago.id = 1;
+            if (req.body.nombre === null || req.body.nombre === undefined) {
+                res.status(401).json("Ingrese nombre de medio de pago");
             } else {
-                nuevoPago.id = m[m.length - 1].id + 1;
+                const m = await Pago.find();
+                const nuevoPago = await new Pago();
+                if (m.length === 0) {
+                    nuevoPago.id = 1;
+                } else {
+                    nuevoPago.id = m[m.length - 1].id + 1;
+                }
+                nuevoPago.nombre = req.body.nombre;
+                await nuevoPago.save();
+                res.status(200).json(`El medio de pago ${nuevoPago.nombre} ha sido agregado`);
             }
-            nuevoPago.nombre = req.body.nombre;
-            await nuevoPago.save();
-            res.status(200).json(`El medio de pago ${nuevoPago.nombre} ha sido agregado`);
-        } catch (error) {
-            console.log(error);
+        } catch {
             res.status(404).json(`Error al cargar el medio de pago`);
         }
     })
+
     // modificar medio de pago
-    router.put("/mediosdepago/:idPago", authAdmin, midIdPago, midCrearMedioPago, async (req, res) => {
+    router.put("/mediosdepago/:idPago", authAdmin, async (req, res) => {
         try {
-            const idPago = Number(req.params.idPago);
-            const p = await Pago.findOne({ id: idPago });
-            p.nombre = req.body.nombre;
-            await p.save();
-            res.status(200).json(`El medio de pago ${p.nombre} ha sido modificado`);
+            if (req.body.nombre === null || req.body.nombre === undefined) {
+                res.status(401).json("Ingrese nombre de medio de pago");
+            } else {
+                const idPago = Number(req.params.idPago);
+                const pagos = await Pago.find();
+                if (idPago > 0 && idPago <= pagos.length) {
+                    const p = await Pago.findOne({ id: idPago });
+                    p.nombre = req.body.nombre;
+                    await p.save();
+                    res.status(200).json(`El medio de pago ${p.nombre} ha sido modificado`);
+                } else {
+                    res.status(406).json("Id de medio de pago inválido");
+                }
+            }
         } catch {
             res.status(404).json(`Error al modificar medio de pago`);
         }
     })
+
     // eliminar medio de pago
-    router.delete("/mediosdepago/:idPago", authAdmin, midIdPago, async (req, res) => {
+    router.delete("/mediosdepago/:idPago", authAdmin, async (req, res) => {
         try {
             const idPago = Number(req.params.idPago);
-            const m = await Pago.deleteOne({ id: idPago });
-            res.status(200).json(`El medio de pago ha sido eliminado`);
+            const pagos = await Pago.find();
+            if (idPago > 0 && idPago <= pagos.length) {
+                const m = await Pago.deleteOne({ id: idPago });
+                res.status(200).json(`El medio de pago ha sido eliminado`);
+            } else {
+                res.status(406).json("Id de medio de pago inválido");
+            }
         } catch {
             res.status(404).json(`Error al eliminar medio de pago`);
         }
     })
-
+    
     return router;
 }
 

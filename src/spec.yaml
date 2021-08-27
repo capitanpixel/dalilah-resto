@@ -59,7 +59,11 @@ paths:
                 telefono:
                   type : integer
                   format: int64
-                direccion:
+                direccion1:
+                  type: string
+                direccion2:
+                  type: string
+                direccion3:
                   type: string
                 password:
                   type: string

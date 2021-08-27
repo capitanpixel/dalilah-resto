@@ -20,18 +20,7 @@ async function authAdmin(req, res, next) {
                 next();
             }
         });
-        /*
-        const idUsuario = Number(req.headers.userid);
-        const u = await Usuario.findOne({ id: idUsuario });
-        if (u.isAdmin === true) {
-            return next();
-        } else {
-            res.status(401).json("No es administrador");
-            
-        }
-        */
-    } catch (error) {
-        console.log(error);
+    } catch {
         res.status(404).json(`Se produjo un error`);
     }
 }
@@ -50,7 +39,7 @@ async function authRegistro(req, res, next) {
             return res.status(406).json("Email inválido");
         } else if (req.body.telefono === null || req.body.telefono === undefined) {
             return res.status(406).json("Teléfono inválido");
-        } else if (req.body.direccion === null || req.body.direccion === undefined) {
+        } else if (req.body.direccion1 === null || req.body.direccion1 === undefined) {
             return res.status(406).json("Direción inválida");
         } else if (req.body.password === null || req.body.password === undefined) {
             return res.status(406).json("Contraseña inválida");
@@ -58,8 +47,7 @@ async function authRegistro(req, res, next) {
             return next();
         }
 
-    } catch (error) {
-        console.log(error);
+    } catch {
         res.status(404).json(`Se produjo un error`);
     }
 }
@@ -84,16 +72,28 @@ async function midLogin(req, res, next) {
             res.status(406).json("Usted debe loguearse");
         }
 
-    } catch (error) {
-        console.log(error);
+    } catch {
         res.status(404).json(`Se produjo un error`);
     }
 }
+
+function midCrearProducto(req, res, next) {
+    if (req.body.precio === null || req.body.precio === undefined) {
+        res.status(406).json("Precio inválido");
+    } else if (req.body.nombre === null || req.body.nombre === undefined) {
+        res.status(406).json("Nombre inválido");
+    } else if (req.body.descripcion === null || req.body.descripcion === undefined) {
+        res.status(406).json("Descripción inválida");
+    } else {
+        return next();
+    }
+} 
 
 module.exports = {
     authAdmin,
     authRegistro,
     authLogin,
     midLogin,
-    encript
+    encript,
+    midCrearProducto
 }

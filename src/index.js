@@ -7,7 +7,6 @@ const { makeProductosRouter } = require("./routers/productos.js");
 const { makePedidosRouter } = require("./routers/pedidos.js");
 const { makePagosRouter } = require("./routers/mediosdepago.js");
 const { makeUsuariosRouter } = require("./routers/usuarios.js");
-const { serverCache } = require("../cache/cache.js");
 
 async function main() {
 
@@ -24,7 +23,6 @@ async function main() {
         server.use("/api/v1", makePedidosRouter());
         server.use("/api/v1", makePagosRouter());
         server.use("/api/v1", makeUsuariosRouter());
-        server.use("/api/v1", serverCache)
         server.listen(PORT, () => {
             console.log('Servidor funcionando en puerto 3000!');
         })

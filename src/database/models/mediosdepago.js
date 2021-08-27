@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const schemaPago = new mongoose.Schema({
     id: Number,
-    nombre: String,
+    nombre: String
 })
 
 const Pago = new mongoose.model("Pago", schemaPago);
