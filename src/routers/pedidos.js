@@ -23,7 +23,7 @@ function makePedidosRouter() {
             }
             nuevoPedido.estado = 1;
             nuevoPedido.hora = new Date();
-            nuevoPedido.descripcion = [];
+            //nuevoPedido.descripcion = [];
             nuevoPedido.usuarioId = Number(req.headers.userid);
             nuevoPedido.montoPago = 0;
             await nuevoPedido.save();
@@ -66,7 +66,7 @@ function makePedidosRouter() {
             } else {
                 res.status(404).json(`Id de pedido inválido`);
             }
-        } catch(error) {
+        } catch (error) {
             console.log(error);
             res.status(404).json(`El pedido no ha podido ser abonado`);
         }
@@ -89,11 +89,15 @@ function makePedidosRouter() {
                     session.startTransaction();
                     if (usuarioId === pedido.usuarioId) {
                         if (pedido.estado === 1) {
-                            pedido.descripcion.push(producto);
-                            pedido.montoPago += producto.precio;
+                            const productoAgregado = {
+                                cantidad: req.body.cantidad,
+                                producto: producto
+                            }
+                            pedido.descripcion.push(productoAgregado);
+                            pedido.montoPago += producto.precio * productoAgregado.cantidad;
                             await pedido.save();
                             await session.commitTransaction();
-                            res.status(200).json(`Producto ${producto.nombre} agregado al pedido ${pedido.id}`);
+                            res.status(200).json(`Producto ${producto.nombre} (cantidad: ${productoAgregado.cantidad}) agregado al pedido ${pedido.id}`);
                         } else {
                             await session.abortTransaction();
                             res.status(200).json(`El pedido ${pedido.id} ya ha sido abonado y no puede modificarse`)
@@ -110,7 +114,8 @@ function makePedidosRouter() {
             } else {
                 res.status(404).json(`Id del pedido inválido`);
             }
-        } catch {
+        } catch (e) {
+            console.log(e);
             res.status(404).json(`No se pudo agregar el producto`);
         }
     })
@@ -122,8 +127,8 @@ function makePedidosRouter() {
             const idPedido = Number(req.params.idPedido);
             const idProducto = Number(req.params.idProducto);
             const u = await Usuario.findOne({ id: usuarioId });
-            const pedido = await Pedido.findOne({ id: idPedido }).exec();
-            const producto = await Producto.findOne({ id: idProducto }).exec();
+            const pedido = await Pedido.findOne({ id: idPedido });
+            const producto = await Producto.findOne({ id: idProducto });
             const pedidos = await Pedido.find();
             const productos = await Producto.find();
             if (idPedido > 0 && idPedido <= pedidos.length) {
@@ -132,15 +137,21 @@ function makePedidosRouter() {
                     session.startTransaction();
                     if (usuarioId === pedido.usuarioId) {
                         if (pedido.estado === 1) {
-                            let productoIndex = pedido.descripcion.indexOf(producto);
-                            pedido.descripcion.splice(productoIndex, 1);
-                            pedido.montoPago -= producto.precio;
-                            await pedido.save();
-                            await session.commitTransaction();
-                            res.status(200).json(`Producto ${producto.nombre} eliminado del pedido ${pedido.id}`);
+                            for (item of pedido.descripcion) {
+                                if (item.producto.id === idProducto) {
+                                    const abono = item.producto.precio * item.cantidad;
+                                    pedido.montoPago -= abono;
+                                    const nuevosProductos = pedido.descripcion.filter( (item) => item.producto.id !== idProducto );
+                                    pedido.descripcion.length = 0;
+                                    pedido.descripcion = nuevosProductos;
+                                    await pedido.save();
+                                    await session.commitTransaction();
+                                    res.status(200).json(`Producto ${producto.nombre} eliminado del pedido ${pedido.id}`);
+                                }
+                            }
                         } else {
                             await session.abortTransaction();
-                            res.status(200).json(`El pedido ${pedido.id} ya ha sido abonado y no puede modificarse`)
+                            res.status(200).json(`El pedido ${pedido.id} ya ha sido abonado y no puede modificarse`);
                         }
                     } else {
                         await session.abortTransaction();
@@ -153,11 +164,67 @@ function makePedidosRouter() {
             } else {
                 res.status(404).json(`Id del pedido inválido`);
             }
-        } catch {
+        } catch (e) {
+            console.log(e);
             res.status(404).json(`No se pudo quitar el producto`);
         }
     })
 
+    //modificar cantidad de productos del pedido
+    router.put("/pedidos/:idPedido/:idProducto", midLogin, async (req, res) => {
+        try {
+            const usuarioId = Number(req.headers.userid);
+            const idPedido = Number(req.params.idPedido);
+            const idProducto = Number(req.params.idProducto);
+            const u = await Usuario.findOne({ id: usuarioId });
+            const pedido = await Pedido.findOne({ id: idPedido });
+            const producto = await Producto.findOne({ id: idProducto });
+            const pedidos = await Pedido.find();
+            const productos = await Producto.find();
+            if (idPedido > 0 && idPedido <= pedidos.length) {
+                if (idProducto > 0 && idProducto <= productos.length) {
+                    const session = await db.startSession();
+                    session.startTransaction();
+                    if (usuarioId === pedido.usuarioId) {
+                        if (pedido.estado === 1) {
+                            for (item of pedido.descripcion) {
+                                if (item.producto.id === idProducto) {
+                                    const abono = item.producto.precio * item.cantidad;
+                                    pedido.montoPago -= abono;
+                                    const nuevosProductos = pedido.descripcion.filter( (item) => item.producto.id !== idProducto );
+                                    pedido.descripcion.length = 0;
+                                    pedido.descripcion = nuevosProductos;
+                                    const productoAgregado = {
+                                        cantidad: req.body.cantidad,
+                                        producto: producto
+                                    }
+                                    pedido.descripcion.push(productoAgregado);
+                                    pedido.montoPago += producto.precio * productoAgregado.cantidad;
+                                    await pedido.save();
+                                    await session.commitTransaction();
+                                    res.status(200).json(`Cantidad del producto ${producto.nombre} modificado a ${productoAgregado.cantidad}`);
+                                }
+                            }
+                        } else {
+                            await session.abortTransaction();
+                            res.status(200).json(`El pedido ${pedido.id} ya ha sido abonado y no puede modificarse`);
+                        }
+                    } else {
+                        await session.abortTransaction();
+                        res.status(404).json(`El pedido ${pedido.id} no corresponde al usuario ${u.nombreUsuario}`);
+                    }
+                    session.endSession();
+                } else {
+                    res.status(404).json(`Id del producto inválido`);
+                }
+            } else {
+                res.status(404).json(`Id del pedido inválido`);
+            }
+        } catch (e) {
+            console.log(e);
+            res.status(404).json(`No se pudo modificar el producto`);
+        }
+    })
     // ver pedidos
     router.get("/pedidos", authAdmin, midLogin, async (req, res) => {
         try {
@@ -167,7 +234,7 @@ function makePedidosRouter() {
             res.status(404).json(`No pudieron cargarse los pedidos`);
         }
     })
-    
+
     //modificar pedido
     router.put("/pedidos/:idPedido", authAdmin, midLogin, async (req, res) => {
         try {
@@ -206,6 +273,7 @@ function makePedidosRouter() {
     })
     return router;
 }
+
 
 module.exports = {
     makePedidosRouter

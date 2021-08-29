@@ -12,7 +12,8 @@ const schemaUsuario = new mongoose.Schema({
     telefono: String,
     password: String,
     login: Boolean,
-    isAdmin: Boolean
+    isAdmin: Boolean,
+    suspendido: Boolean
 })
 
 const Usuario = new mongoose.model("Usuario", schemaUsuario);

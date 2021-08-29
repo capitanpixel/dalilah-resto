@@ -89,11 +89,22 @@ function midCrearProducto(req, res, next) {
     }
 } 
 
+async function midSuspendido(req, res, next) {
+    const idUsuario = Number(req.headers.userid);
+    const u = await findOne({ id: idUsuario });
+    if (u.suspendido === true) {
+        res.status(401).json(`Usted está suspendido`);
+    } else {
+        return next();
+    }
+}
+
 module.exports = {
     authAdmin,
     authRegistro,
     authLogin,
     midLogin,
     encript,
-    midCrearProducto
+    midCrearProducto,
+    midSuspendido
 }

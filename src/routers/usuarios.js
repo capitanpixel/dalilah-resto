@@ -32,6 +32,7 @@ function makeUsuariosRouter() {
             }
             nuevoUsuario.login = false;
             nuevoUsuario.isAdmin = true;
+            nuevoUsuario.suspendido = false;
             await nuevoUsuario.save();
             res.status(200).json(`Usuario ${nuevoUsuario.nombreUsuario} registrado con exito`);
         } catch (error) {
@@ -80,6 +81,18 @@ function makeUsuariosRouter() {
             res.status(200).json(p)
         } catch {
             res.status(404).json(`No se ha podido cargar el historial del usuario`)
+        }
+    })
+
+    router.post("/usuarios/:idUsuario", authAdmin, async (req, res) => {
+        try {
+            const usuarioId = Number(req.params.idUsuario);
+            const u = await findOne({ id: usuarioId});
+            u.suspendido = true;
+            u.save();
+            res.status(200).json(`El usuario ${u.nombreUsuario} ha sido suspendido`);
+        } catch {
+            res.status(404).json(`No se ha podido suspender al usuario`);
         }
     })
 
