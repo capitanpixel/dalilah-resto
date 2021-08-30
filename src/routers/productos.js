@@ -1,7 +1,7 @@
 const { Router } = require("express");
 const redis = require("redis");
 const { Producto } = require("../database/models/productos");
-const { authAdmin } = require("../middlewares/middlewares");
+const { authAdmin, midIdProducto } = require("../middlewares/middlewares");
 
 const client = redis.createClient();
 client.on("error", function (error) {
@@ -16,10 +16,10 @@ function makeProductosRouter() {
     router.get("/productos", async (req, res) => {
         try {
             client.get("productos", (error, rep) => {
-                if(error) {
+                if (error) {
                     res.json(error);
                 }
-                if(rep) {
+                if (rep) {
                     res.json(rep);
                 }
             });
@@ -52,41 +52,31 @@ function makeProductosRouter() {
     })
 
     // modificar producto
-    router.put("/productos/:idProducto", authAdmin, async (req, res) => {
+    router.put("/productos/:idProducto", authAdmin, midIdProducto, async (req, res) => {
         try {
             const idProducto = Number(req.params.idProducto);
             const productos = await Producto.find();
-            if (idProducto > 0 && idProducto <= productos.length) {
-                const p = await Producto.findOne({ id: idProducto });
-                p.precio = req.body.precio;
-                p.save();
-                const productos = await Producto.find();
-                client.set("productos", JSON.stringify(productos));
-                res.status(200).json(`El producto ${p.nombre} ha sido modificado`);
-            } else {
-                res.status(404).json(`Id del producto no existente`);
-            }
+            const p = await Producto.findOne({ id: idProducto });
+            p.precio = req.body.precio;
+            p.save();
+            client.set("productos", JSON.stringify(productos));
+            res.status(200).json(`El producto ${p.nombre} ha sido modificado`);
         } catch {
             res.status(404).json(`Error al modificar el producto`);
         }
     })
 
     // eliminar producto
-    router.delete("/productos/:idProducto", authAdmin, async (req, res) => {
+    router.delete("/productos/:idProducto", authAdmin, midIdProducto, async (req, res) => {
         try {
             const idProducto = Number(req.params.idProducto);
-            const productos = await Producto.find();
-            if (idProducto > 0 && idProducto <= productos.length) {
-                await Producto.deleteOne({ id: idProducto });
-                res.status(200).json(`El producto ha sido eliminado`);
-            } else {
-                res.status(404).json(`Id del producto no existente`);
-            }
+            await Producto.deleteOne({ id: idProducto });
+            res.status(200).json(`El producto ha sido eliminado`);
         } catch {
             res.status(404).json(`No se ha podido eliminar el producto`);
         }
     })
-    
+
     return router;
 }
 

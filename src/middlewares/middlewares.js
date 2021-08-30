@@ -1,6 +1,10 @@
 const jwt = require('jsonwebtoken');
 const { createHmac } = require('crypto');
 const { Usuario } = require("../database/models/usuarios");
+const { Pedido } = require("../database/models/pedidos");
+const { Producto } = require("../database/models/productos");
+const { Pago } = require("../database/models/mediosdepago");
+
 
 function encript(secret) {
     return createHmac('sha256', secret).digest('hex');
@@ -99,6 +103,56 @@ async function midSuspendido(req, res, next) {
     }
 }
 
+async function midIdUsuario(req, res, next) {
+    const usuarios = await Usuario.find();
+    for (u of usuarios) {
+        if (u.id === Number(req.params.idUsuario)) {
+            return next();
+        }
+    }
+    res.status(401).json(`Id de Usuario inválido`);
+}
+
+async function midIdPedido(req, res, next) {
+    const pedidos = await Pedido.find();
+    for (p of pedidos) {
+        if (p.id === Number(req.params.idPedido)) {
+            return next();
+        }
+    }
+    res.status(401).json(`Id de Pedido inválido`);
+}
+
+async function midIdProducto(req, res, next) {
+    const productos = await Producto.find();
+    for (p of productos) {
+        if (p.id === Number(req.params.idProducto)) {
+            return next();
+        }
+    }
+    res.status(401).json(`Id de Producto inválido`);
+}
+
+async function midIdPago(req, res, next) {
+    const pagos = await Pago.find();
+    for (p of pagos) {
+        if (p.id === Number(req.params.idPago)) {
+            return next();
+        }
+    }
+    res.status(401).json(`Id de Pago inválido`);
+}
+
+async function midSuspendido(req, res, next) {
+    const idUsuario = Number(req.headers.userid);
+    const u = await Usuario.findOne({ id: idUsuario });
+    if (u.suspendido === false) {
+        return next();
+    } else {
+        res.status(404).json(`El usuario ${u.nombreUsuario} está suspendido`);
+    }
+}
+
 module.exports = {
     authAdmin,
     authRegistro,
@@ -106,5 +160,10 @@ module.exports = {
     midLogin,
     encript,
     midCrearProducto,
+    midSuspendido,
+    midIdPago,
+    midIdPedido,
+    midIdProducto,
+    midIdUsuario,
     midSuspendido
 }

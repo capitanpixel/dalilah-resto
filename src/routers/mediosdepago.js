@@ -1,9 +1,9 @@
 const { Router } = require("express");
-const { authAdmin } = require("../middlewares/middlewares");
+const { authAdmin, midIdPago } = require("../middlewares/middlewares");
 const { Pago } = require("../database/models/mediosdepago");
 
 function makePagosRouter() {
-    
+
     const router = Router();
 
     // ver medios de pago
@@ -39,21 +39,16 @@ function makePagosRouter() {
     })
 
     // modificar medio de pago
-    router.put("/mediosdepago/:idPago", authAdmin, async (req, res) => {
+    router.put("/mediosdepago/:idPago", authAdmin, midIdPago, async (req, res) => {
         try {
             if (req.body.nombre === null || req.body.nombre === undefined) {
                 res.status(401).json("Ingrese nombre de medio de pago");
             } else {
                 const idPago = Number(req.params.idPago);
-                const pagos = await Pago.find();
-                if (idPago > 0 && idPago <= pagos.length) {
-                    const p = await Pago.findOne({ id: idPago });
-                    p.nombre = req.body.nombre;
-                    await p.save();
-                    res.status(200).json(`El medio de pago ${p.nombre} ha sido modificado`);
-                } else {
-                    res.status(406).json("Id de medio de pago inválido");
-                }
+                const p = await Pago.findOne({ id: idPago });
+                p.nombre = req.body.nombre;
+                await p.save();
+                res.status(200).json(`El medio de pago ${p.nombre} ha sido modificado`);
             }
         } catch {
             res.status(404).json(`Error al modificar medio de pago`);
@@ -61,21 +56,16 @@ function makePagosRouter() {
     })
 
     // eliminar medio de pago
-    router.delete("/mediosdepago/:idPago", authAdmin, async (req, res) => {
+    router.delete("/mediosdepago/:idPago", authAdmin, midIdPago, async (req, res) => {
         try {
             const idPago = Number(req.params.idPago);
-            const pagos = await Pago.find();
-            if (idPago > 0 && idPago <= pagos.length) {
-                const m = await Pago.deleteOne({ id: idPago });
-                res.status(200).json(`El medio de pago ha sido eliminado`);
-            } else {
-                res.status(406).json("Id de medio de pago inválido");
-            }
+            await Pago.deleteOne({ id: idPago });
+            res.status(200).json(`El medio de pago ha sido eliminado`);
         } catch {
             res.status(404).json(`Error al eliminar medio de pago`);
         }
     })
-    
+
     return router;
 }
 

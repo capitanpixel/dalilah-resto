@@ -2,7 +2,7 @@ const { Router } = require("express");
 const jwt = require('jsonwebtoken');
 const { Usuario } = require("../database/models/usuarios");
 const { Pedido } = require("../database/models/pedidos")
-const { authLogin, authRegistro, authAdmin, midLogin, encript } = require("../middlewares/middlewares");
+const { authLogin, authRegistro, authAdmin, midLogin, encript, midIdUsuario, midSuspendido } = require("../middlewares/middlewares");
 
 function makeUsuariosRouter() {
 
@@ -41,7 +41,7 @@ function makeUsuariosRouter() {
         }
     })
     // login usuario
-    router.post("/login", authLogin, async (req, res) => {
+    router.post("/login", authLogin, midSuspendido, async (req, res) => {
         try {
             const u = await Usuario.findOne({ nombreUsuario: req.body.nombreUsuario });
             if (u.password === encript(req.body.password)) {
@@ -62,6 +62,31 @@ function makeUsuariosRouter() {
 
     })
 
+    router.post("/logout", midLogin, async (req, res) => {
+        try {
+            const idUsuario = Number(req.headers.userid);
+            const u = await findOne({ id: idUsuario });
+            u.login = false;
+            u.save();
+            res.status(200).json(`Usuario ${u.nombreUsuario} ha cerrado sesión`);
+        } catch {
+            res.status(404).json(`Error al cerrar sesión`);
+        }
+    })
+
+    router.post("/suspension/:idUsuario", async (req, res) => {
+        try {
+            const usuarioId = Number(req.params.idUsuario);
+            const u = await Usuario.findOne({ id: usuarioId });
+            u.suspendido = req.body.suspendido;
+            u.login = false;
+            u.save();
+            res.status(200).json(`El estado de suspensión de ${u.nombreUsuario} ha sido modificado a ${u.suspendido}`);
+        } catch {
+            res.status(404).json(`Error al suspender usuario`);
+        }
+    })
+
     // ver usuarios
     router.get("/usuarios", midLogin, authAdmin, async (req, res) => {
         try {
@@ -74,7 +99,7 @@ function makeUsuariosRouter() {
     })
 
     // ver historial del usuario
-    router.get("/usuarios/:idUsuario", midLogin, async (req, res) => {
+    router.get("/usuarios/:idUsuario", midLogin, midIdUsuario, async (req, res) => {
         try {
             const usuarioId = Number(req.params.idUsuario);
             const p = await Pedido.find({ usuarioId: usuarioId });
