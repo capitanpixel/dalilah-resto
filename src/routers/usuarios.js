@@ -2,7 +2,8 @@ const { Router } = require("express");
 const jwt = require('jsonwebtoken');
 const { Usuario } = require("../database/models/usuarios");
 const { Pedido } = require("../database/models/pedidos")
-const { authLogin, authRegistro, authAdmin, midLogin, encript, midIdUsuario, midSuspendido } = require("../middlewares/middlewares");
+const { midIdUsuario } = require("../middlewares/middlewares");
+const { authLogin, authRegistro, authAdmin, midLogin, encript, midSuspendido, authUser } = require("../middlewares/auth");
 
 function makeUsuariosRouter() {
 
@@ -31,12 +32,10 @@ function makeUsuariosRouter() {
                 nuevoUsuario.agenda.push(req.body.direccion3);
             }
             nuevoUsuario.login = false;
-            nuevoUsuario.isAdmin = true;
             nuevoUsuario.suspendido = false;
             await nuevoUsuario.save();
             res.status(200).json(`Usuario ${nuevoUsuario.nombreUsuario} registrado con exito`);
-        } catch (error) {
-            console.log(error);
+        } catch {
             res.status(404).json(`Error al registrar usuario`);
         }
     })
@@ -55,26 +54,27 @@ function makeUsuariosRouter() {
             } else {
                 res.status(404).json(`Contraseña invalida`);
             }
-        } catch (error) {
-            console.log(error);
+        } catch {
             res.status(404).json(`Error al loguearse`);
         }
 
     })
-
-    router.post("/logout", midLogin, async (req, res) => {
+    // logout
+    router.post("/logout", authUser, midLogin, async (req, res) => {
         try {
             const idUsuario = Number(req.headers.userid);
-            const u = await findOne({ id: idUsuario });
+            const u = await Usuario.findOne({ id: idUsuario });
             u.login = false;
             u.save();
             res.status(200).json(`Usuario ${u.nombreUsuario} ha cerrado sesión`);
-        } catch {
+        } catch(e) {
+            console.log(e);
             res.status(404).json(`Error al cerrar sesión`);
         }
     })
 
-    router.post("/suspension/:idUsuario", async (req, res) => {
+    // suspender usuario
+    router.post("/usuarios/:idUsuario", authAdmin, async (req, res) => {
         try {
             const usuarioId = Number(req.params.idUsuario);
             const u = await Usuario.findOne({ id: usuarioId });
@@ -88,36 +88,23 @@ function makeUsuariosRouter() {
     })
 
     // ver usuarios
-    router.get("/usuarios", midLogin, authAdmin, async (req, res) => {
+    router.get("/usuarios", authAdmin, midLogin, async (req, res) => {
         try {
             const u = await Usuario.find();
             res.status(200).json(u);
-        } catch (error) {
-            console.log(error);
+        } catch {
             res.status(404).json(`Error al cargar los usuarios`);
         }
     })
 
     // ver historial del usuario
-    router.get("/usuarios/:idUsuario", midLogin, midIdUsuario, async (req, res) => {
+    router.get("/usuarios/:idUsuario", authUser, midLogin, midIdUsuario, async (req, res) => {
         try {
             const usuarioId = Number(req.params.idUsuario);
             const p = await Pedido.find({ usuarioId: usuarioId });
             res.status(200).json(p)
         } catch {
             res.status(404).json(`No se ha podido cargar el historial del usuario`)
-        }
-    })
-
-    router.post("/usuarios/:idUsuario", authAdmin, async (req, res) => {
-        try {
-            const usuarioId = Number(req.params.idUsuario);
-            const u = await findOne({ id: usuarioId});
-            u.suspendido = true;
-            u.save();
-            res.status(200).json(`El usuario ${u.nombreUsuario} ha sido suspendido`);
-        } catch {
-            res.status(404).json(`No se ha podido suspender al usuario`);
         }
     })
 

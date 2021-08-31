@@ -5,7 +5,8 @@ const { Pago } = require("../database/models/mediosdepago");
 const { Pedido } = require("../database/models/pedidos");
 const { Producto } = require("../database/models/productos");
 const { Usuario } = require("../database/models/usuarios");
-const { authAdmin, midLogin, midIdPedido, midIdProducto } = require("../middlewares/middlewares");
+const { midIdPedido, midIdProducto } = require("../middlewares/middlewares");
+const { authAdmin, midLogin } = require("../middlewares/auth");
 
 function makePedidosRouter() {
 
@@ -187,6 +188,7 @@ function makePedidosRouter() {
             res.status(404).json(`No se pudo modificar el producto`);
         }
     })
+
     // ver pedidos
     router.get("/pedidos", authAdmin, midLogin, async (req, res) => {
         try {
@@ -225,7 +227,6 @@ function makePedidosRouter() {
     })
     return router;
 }
-
 
 module.exports = {
     makePedidosRouter
