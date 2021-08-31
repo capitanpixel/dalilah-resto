@@ -15,5 +15,5 @@ npm i swagger-ui-express
 ~~~
 y hacerla correr con: 
 ~~~
-npm start
+npm run dev
 ~~~

@@ -7,8 +7,6 @@ servers:
   - url: http://localhost:3000/api/v1
     description: development server
 tags:
-  - name: "auth"
-    description: operaciones de autenticación
   - name: "usuarios"
     description: operaciones de los usuarios
   - name: "pedidos"
@@ -21,7 +19,7 @@ paths:
   /login:
     post:
       tags:
-      - "auth"
+      - "usuarios"
       summary: Login
       requestBody:
         required: true
@@ -30,7 +28,7 @@ paths:
             schema:
               type: object
               properties:
-                username:
+                nombreUsuario:
                   type: string
                 password:
                   type: string
@@ -43,7 +41,7 @@ paths:
   /register:
     post:
       tags:
-      - "auth"
+      - "usuarios"
       summary: Registrar un usuario
       requestBody:
         required: true
@@ -61,7 +59,11 @@ paths:
                 telefono:
                   type : integer
                   format: int64
-                direccion:
+                direccion1:
+                  type: string
+                direccion2:
+                  type: string
+                direccion3:
                   type: string
                 password:
                   type: string
@@ -86,6 +88,34 @@ paths:
             format: int64
             minimum: 1
       description: Muestra todos los usuarios
+      responses:
+        '200':
+          description: Ok
+        '405':
+          description: Elemento Invalido
+  /usuarios/{idUsuario}:
+    get:
+      tags:
+      - "usuarios"
+      summary: Listado del historial del usuario
+      parameters:
+        - name: userid
+          in: header
+          required: true
+          description: Id del usuario
+          schema:
+            type : integer
+            format: int64
+            minimum: 1
+        - name: idUsuario
+          in: path
+          required: true
+          description: Id del usuario
+          schema:
+            type : integer
+            format: int64
+            minimum: 1
+      description: Muestra historial del usuario
       responses:
         '200':
           description: Ok
@@ -130,26 +160,6 @@ paths:
           description: Ok
         '405':
           description: Elemento Invalido
-  /pedidos/historial:
-    get:
-      tags:
-      - "pedidos"
-      summary: Listado del historial de pedidos de un usuario
-      parameters:
-        - name: userid
-          in: header
-          required: true
-          description: Id del usuario
-          schema:
-            type : integer
-            format: int64
-            minimum: 1
-      description: Muestra el listado del historial
-      responses:
-        '200':
-          description: Ok
-        '405':
-          description: Elemento Invalido
   /pedidos/{idPedido}:
     post:
       tags:
@@ -181,8 +191,6 @@ paths:
               properties:
                 metodoPago:
                   type : integer
-                  format: int64
-                  minimum: 1
       description: Paga un pedido del perfil del usuario
       responses:
         '200':
@@ -254,6 +262,77 @@ paths:
             description: Ok
           '405':
             description: Elemento Invalido
+  /pedidos/{idPedido}/{idProducto}:
+    post:
+      tags:
+        - "pedidos"
+      summary: Agrega un producto al pedido
+      parameters:
+        - name: userid
+          in: header
+          required: true
+          description: Id del usuario
+          schema:
+            type : integer
+            format: int64
+            minimum: 1
+        - name: idPedido
+          in: path
+          required: true
+          description: Id del pedido
+          schema:
+            type : integer
+            format: int64
+            minimum: 1
+        - name: idProducto
+          in: path
+          required: true
+          description: Id del producto
+          schema:
+            type : integer
+            format: int64
+            minimum: 1
+      description: Agrega un producto al pedido
+      responses:
+        '200':
+          description: Ok
+        '405':
+          description: Elemento Invalido
+    delete:
+      tags:
+        - "pedidos"
+      summary: Elimina un producto del pedido
+      parameters:
+        - name: userid
+          in: header
+          required: true
+          description: Id del usuario
+          schema:
+            type : integer
+            format: int64
+            minimum: 1
+        - name: idPedido
+          in: path
+          required: true
+          description: Id del pedido
+          schema:
+            type : integer
+            format: int64
+            minimum: 1
+        - name: idProducto
+          in: path
+          required: true
+          description: Id del producto
+          schema:
+            type : integer
+            format: int64
+            minimum: 1
+      description: Elimina un producto del pedido
+      responses:
+        '200':
+          description: Ok
+        '405':
+          description: Elemento Invalido
   /productos:
     get:
       tags:
@@ -302,8 +381,6 @@ paths:
                     type: string
                   descripcion:
                     type: string
-                  img:
-                    type: string
         description: Crea un producto
         responses:
           '200':
@@ -347,8 +424,6 @@ paths:
                     type: string
                   descripcion:
                     type: string
-                  img:
-                    type: string
         description: Modifica un producto
         responses:
           '200':
@@ -382,77 +457,6 @@ paths:
             description: Ok
           '405':
             description: Elemento Invalido
-  /productos/{idPedido}/{idProducto}:
-    post:
-      tags:
-        - "productos"
-      summary: Agrega un producto al pedido
-      parameters:
-        - name: userid
-          in: header
-          required: true
-          description: Id del usuario
-          schema:
-            type : integer
-            format: int64
-            minimum: 1
-        - name: idPedido
-          in: path
-          required: true
-          description: Id del pedido
-          schema:
-            type : integer
-            format: int64
-            minimum: 1
-        - name: idProducto
-          in: path
-          required: true
-          description: Id del producto
-          schema:
-            type : integer
-            format: int64
-            minimum: 1
-      description: Agrega un producto al pedido
-      responses:
-        '200':
-          description: Ok
-        '405':
-          description: Elemento Invalido
-    delete:
-      tags:
-        - "productos"
-      summary: Elimina un producto del pedido
-      parameters:
-        - name: userid
-          in: header
-          required: true
-          description: Id del usuario
-          schema:
-            type : integer
-            format: int64
-            minimum: 1
-        - name: idPedido
-          in: path
-          required: true
-          description: Id del pedido
-          schema:
-            type : integer
-            format: int64
-            minimum: 1
-        - name: idProducto
-          in: path
-          required: true
-          description: Id del producto
-          schema:
-            type : integer
-            format: int64
-            minimum: 1
-      description: Elimina un producto del pedido
-      responses:
-        '200':
-          description: Ok
-        '405':
-          description: Elemento Invalido
   /mediosdepago:
     get:
       tags:
@@ -501,7 +505,7 @@ paths:
           description: Ok
         '405':
           description: Elemento Invalido
-  /mediosdepago/{idMedioPago}:  
+  /mediosdepago/{idPago}:  
     delete:
       tags:
       - "pagos"
@@ -515,7 +519,7 @@ paths:
             type : integer
             format: int64
             minimum: 1
-        - name: idMedioPago
+        - name: idPago
           in: path
           required: true
           description: Id del medio de pago
@@ -542,7 +546,7 @@ paths:
             type : integer
             format: int64
             minimum: 1
-        - name: idMedioPago
+        - name: idPago
           in: path
           required: true
           description: Id del medio de pago
