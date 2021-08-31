@@ -1,5 +1,6 @@
 const { Router } = require("express");
-const { authAdmin, midIdPago } = require("../middlewares/middlewares");
+const { midIdPago } = require("../middlewares/middlewares");
+const { authAdmin } = require("../middlewares/auth");
 const { Pago } = require("../database/models/mediosdepago");
 
 function makePagosRouter() {

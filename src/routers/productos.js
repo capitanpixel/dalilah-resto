@@ -1,7 +1,8 @@
 const { Router } = require("express");
 const redis = require("redis");
 const { Producto } = require("../database/models/productos");
-const { authAdmin, midIdProducto } = require("../middlewares/middlewares");
+const { midIdProducto } = require("../middlewares/middlewares");
+const { authAdmin } = require("../middlewares/auth");
 
 const client = redis.createClient();
 client.on("error", function (error) {

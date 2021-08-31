@@ -16,6 +16,32 @@ tags:
   - name: "pagos"
     description: operaciones de los medios de pago
 paths:
+  /usuarios:
+    get:
+      tags:
+      - "usuarios"
+      summary: Listado de todos los usuarios
+      parameters:
+        - name: authorization
+          in: header
+          required: true
+          description: Token del usuario
+          schema:
+            type : string
+        - name: userid
+          in: header
+          required: true
+          description: Id del usuario
+          schema:
+            type : integer
+            format: int64
+            minimum: 1
+      description: Muestra todos los usuarios
+      responses:
+        '200':
+          description: Ok
+        '405':
+          description: Elemento Invalido
   /login:
     post:
       tags:
@@ -38,6 +64,32 @@ paths:
           description: Ok
         '405':
           description: Elemento Invalido
+  /logout:
+    post:
+      tags:
+      - "usuarios"
+      summary: Logout
+      parameters:
+        - name: userid
+          in: header
+          required: true
+          description: Id del usuario
+          schema:
+            type : integer
+            format: int64
+            minimum: 1
+        - name: authorization
+          in: header
+          required: true
+          description: Token del usuario
+          schema:
+            type : string
+      description: Login de usuario      
+      responses:
+        '200':
+          description: Ok
+        '405':
+          description: Elemento Invalido  
   /register:
     post:
       tags:
@@ -73,11 +125,11 @@ paths:
           description: OK
         '405':
           description: Elemento Invalido
-  /usuarios:
-    get:
+  /usuarios/{idUsuario}:
+    post:
       tags:
       - "usuarios"
-      summary: Listado de todos los usuarios
+      summary: Suspender al usuario
       parameters:
         - name: userid
           in: header
@@ -87,13 +139,20 @@ paths:
             type : integer
             format: int64
             minimum: 1
-      description: Muestra todos los usuarios
+        - name: idUsuario
+          in: path
+          required: true
+          description: Id del usuario
+          schema:
+            type : integer
+            format: int64
+            minimum: 1
+      description: Muestra historial del usuario
       responses:
         '200':
           description: Ok
         '405':
           description: Elemento Invalido
-  /usuarios/{idUsuario}:
     get:
       tags:
       - "usuarios"
@@ -298,10 +357,11 @@ paths:
           description: Ok
         '405':
           description: Elemento Invalido
-    delete:
+    
+    put:
       tags:
         - "pedidos"
-      summary: Elimina un producto del pedido
+      summary: Modifica un producto del pedido
       parameters:
         - name: userid
           in: header
