@@ -26,7 +26,8 @@ function makeProductosRouter() {
             });
             const p = await Producto.find();
             client.set("productos", JSON.stringify(p));
-            res.status(200).json(p);
+            //res.status(200).json(p);
+            return
         } catch {
             res.status(404).json(`No se han podido cargar los productos`);
         }
@@ -46,7 +47,9 @@ function makeProductosRouter() {
             nuevoProducto.precio = req.body.precio;
             nuevoProducto.descripcion = req.body.descripcion;
             await nuevoProducto.save();
-            res.status(200).json(`El producto "${nuevoProducto.nombre}" ha sido creado`);
+            const productos = await Producto.find();
+            client.set("productos", JSON.stringify(productos));
+            res.status(200).json(`El producto ${nuevoProducto.nombre} ha sido creado`);
         } catch {
             res.status(404).json(`No se ha podido crear el producto`);
         }
@@ -72,6 +75,8 @@ function makeProductosRouter() {
         try {
             const idProducto = Number(req.params.idProducto);
             await Producto.deleteOne({ id: idProducto });
+            const productos = await Producto.find();
+            client.set("productos", JSON.stringify(productos));
             res.status(200).json(`El producto ha sido eliminado`);
         } catch {
             res.status(404).json(`No se ha podido eliminar el producto`);

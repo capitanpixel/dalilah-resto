@@ -35,7 +35,8 @@ function makeUsuariosRouter() {
             nuevoUsuario.suspendido = false;
             await nuevoUsuario.save();
             res.status(200).json(`Usuario ${nuevoUsuario.nombreUsuario} registrado con exito`);
-        } catch {
+        } catch(e) {
+            console.log(e);
             res.status(404).json(`Error al registrar usuario`);
         }
     })
@@ -74,7 +75,7 @@ function makeUsuariosRouter() {
     })
 
     // suspender usuario
-    router.post("/usuarios/:idUsuario", authAdmin, async (req, res) => {
+    router.post("/usuarios/:idUsuario", authAdmin, midLogin, async (req, res) => {
         try {
             const usuarioId = Number(req.params.idUsuario);
             const u = await Usuario.findOne({ id: usuarioId });

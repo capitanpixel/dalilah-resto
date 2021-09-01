@@ -14,7 +14,7 @@ async function authAdmin(req, res, next) {
         jwt.verify(token, encript(JWT_SECRET), (err, decoded) => {
             if (err) {
                 console.log(err);
-                res.status(401).send('You are not authorized.   .|.');
+                res.status(401).send('Usted no es administrador');
             } else {
                 req.user = decoded;
                 next();
@@ -67,7 +67,8 @@ async function authRegistro(req, res, next) {
             return next();
         }
 
-    } catch {
+    } catch(e) {
+        console.log(e);
         res.status(404).json(`Se produjo un error`);
     }
 }
@@ -98,8 +99,7 @@ async function midLogin(req, res, next) {
 }
 
 async function midSuspendido(req, res, next) {
-    const idUsuario = Number(req.headers.userid);
-    const u = await Usuario.findOne({ id: idUsuario });
+    const u = await Usuario.findOne({ nombreUsuario: req.body.nombreUsuario });
     if (u.suspendido === true) {
         res.status(401).json(`Usted está suspendido`);
     } else {

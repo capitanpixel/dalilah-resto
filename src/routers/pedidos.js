@@ -6,14 +6,14 @@ const { Pedido } = require("../database/models/pedidos");
 const { Producto } = require("../database/models/productos");
 const { Usuario } = require("../database/models/usuarios");
 const { midIdPedido, midIdProducto } = require("../middlewares/middlewares");
-const { authAdmin, midLogin } = require("../middlewares/auth");
+const { authAdmin } = require("../middlewares/auth");
 
 function makePedidosRouter() {
 
     const router = Router();
 
     // crear pedido
-    router.post("/pedidos", midLogin, async (req, res) => {
+    router.post("/pedidos", async (req, res) => {
         try {
             const p = await Pedido.find();
             const nuevoPedido = new Pedido();
@@ -27,14 +27,14 @@ function makePedidosRouter() {
             nuevoPedido.usuarioId = Number(req.headers.userid);
             nuevoPedido.montoPago = 0;
             await nuevoPedido.save();
-            res.status(200).json(`Pedido ${nuevoPedido.id} creado`);
+            res.status(200).json(`Pedido ${nuevoPedido.id} creado por el usuario ${nuevoPedido.usuarioId}`);
         } catch {
             res.status(401).json(`El pedido no ha podido guardarse`);
         }
     })
 
     // pagar pedido
-    router.post("/pedidos/:idPedido", midLogin, midIdPedido, async (req, res) => {
+    router.post("/pedidos/:idPedido", midIdPedido, async (req, res) => {
         try {
             const idUsuario = Number(req.headers.userid);
             const idPedido = Number(req.params.idPedido);
@@ -68,7 +68,7 @@ function makePedidosRouter() {
     })
 
     // agregar producto al pedido
-    router.post("/pedidos/:idPedido/:idProducto", midLogin, midIdPedido, midIdProducto, async (req, res) => {
+    router.post("/pedidos/:idPedido/:idProducto", midIdPedido, midIdProducto, async (req, res) => {
         try {
             const usuarioId = Number(req.headers.userid);
             const idPedido = Number(req.params.idPedido);
@@ -88,7 +88,7 @@ function makePedidosRouter() {
                     pedido.montoPago += producto.precio * productoAgregado.cantidad;
                     await pedido.save();
                     await session.commitTransaction();
-                    res.status(200).json(`Producto ${producto.nombre} (cantidad: ${productoAgregado.cantidad}) agregado al pedido ${pedido.id}`);
+                    res.status(200).json(`Producto ${producto.nombre} (cantidad: ${productoAgregado.cantidad}) agregado al pedido ${pedido.id} por el usuario ${u.nombreUsuario}`);
                 } else {
                     await session.abortTransaction();
                     res.status(200).json(`El pedido ${pedido.id} ya ha sido abonado y no puede modificarse`)
@@ -106,7 +106,7 @@ function makePedidosRouter() {
     })
 
     // quitar producto del pedido
-    router.delete("/pedidos/:idPedido/:idProducto", midLogin, midIdPedido, midIdProducto, async (req, res) => {
+    router.delete("/pedidos/:idPedido/:idProducto", midIdPedido, midIdProducto, async (req, res) => {
         try {
             const usuarioId = Number(req.headers.userid);
             const idPedido = Number(req.params.idPedido);
@@ -145,7 +145,7 @@ function makePedidosRouter() {
     })
 
     //modificar cantidad de productos del pedido
-    router.put("/pedidos/:idPedido/:idProducto", midLogin, midIdProducto, midIdPedido, async (req, res) => {
+    router.put("/pedidos/:idPedido/:idProducto", midIdProducto, midIdPedido, async (req, res) => {
         try {
             const usuarioId = Number(req.headers.userid);
             const idPedido = Number(req.params.idPedido);
@@ -171,7 +171,7 @@ function makePedidosRouter() {
                             pedido.montoPago += producto.precio * productoAgregado.cantidad;
                             await pedido.save();
                             await session.commitTransaction();
-                            res.status(200).json(`Cantidad del producto ${producto.nombre} modificado a ${productoAgregado.cantidad}`);
+                            res.status(200).json(`Cantidad del producto ${producto.nombre} modificado a ${productoAgregado.cantidad} en el pedido ${pedido.id}`);
                         }
                     }
                 } else {
@@ -190,7 +190,7 @@ function makePedidosRouter() {
     })
 
     // ver pedidos
-    router.get("/pedidos", authAdmin, midLogin, async (req, res) => {
+    router.get("/pedidos", authAdmin, async (req, res) => {
         try {
             const p = await Pedido.find();
             res.status(200).json(p);
@@ -200,7 +200,7 @@ function makePedidosRouter() {
     })
 
     //modificar pedido
-    router.put("/pedidos/:idPedido", authAdmin, midLogin, midIdPedido, async (req, res) => {
+    router.put("/pedidos/:idPedido", authAdmin, midIdPedido, async (req, res) => {
         try {
             const idPedido = Number(req.params.idPedido);
             const p = await Pedido.findOne({ id: idPedido }).exec();
@@ -216,7 +216,7 @@ function makePedidosRouter() {
         }
     })
     // eliminar pedido
-    router.delete("/pedidos/:idPedido", authAdmin, midLogin, midIdPedido, async (req, res) => {
+    router.delete("/pedidos/:idPedido", authAdmin, midIdPedido, async (req, res) => {
         try {
             const idPedido = Number(req.params.idPedido);
             await Pedido.deleteOne({ id: idPedido });

@@ -250,6 +250,8 @@ paths:
               properties:
                 metodoPago:
                   type : integer
+                direccion:
+                  type : integer
       description: Paga un pedido del perfil del usuario
       responses:
         '200':
@@ -351,13 +353,58 @@ paths:
             type : integer
             format: int64
             minimum: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cantidad:
+                  type : integer
+                  format: int64
+                  minimum: 1
       description: Agrega un producto al pedido
       responses:
         '200':
           description: Ok
         '405':
           description: Elemento Invalido
-    
+    delete:
+      tags:
+        - "pedidos"
+      summary: Elimina un producto del pedido
+      parameters:
+        - name: userid
+          in: header
+          required: true
+          description: Id del usuario
+          schema:
+            type : integer
+            format: int64
+            minimum: 1
+        - name: idPedido
+          in: path
+          required: true
+          description: Id del pedido
+          schema:
+            type : integer
+            format: int64
+            minimum: 1
+        - name: idProducto
+          in: path
+          required: true
+          description: Id del producto
+          schema:
+            type : integer
+            format: int64
+            minimum: 1
+      description: Elimina un producto del pedido
+      responses:
+        '200':
+          description: Ok
+        '405':
+          description: Elemento Invalido    
     put:
       tags:
         - "pedidos"
@@ -387,7 +434,18 @@ paths:
             type : integer
             format: int64
             minimum: 1
-      description: Elimina un producto del pedido
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cantidad:
+                  type : integer
+                  format: int64
+                  minimum: 1
+      description: Modifica un producto del pedido
       responses:
         '200':
           description: Ok

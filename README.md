@@ -12,6 +12,13 @@ npm install -g nodemon
 npm i express
 npm i js-yaml
 npm i swagger-ui-express
+npm i mongoose
+npm i crypto-js
+npm i dotenv
+npm i helmet
+npm i jsonwebtoken
+npm i redis
+npm i mocha
 ~~~
 y hacerla correr con: 
 ~~~
