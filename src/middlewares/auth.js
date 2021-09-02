@@ -48,8 +48,12 @@ async function authUser(req, res, next) {
 async function authRegistro(req, res, next) {
     try {
         const u = await Usuario.findOne({ email: req.body.email });
+        const n = await Usuario.findOne({ email: req.body.nombreUsuario });
         if (u) {
             return res.status(406).json("Email ya existente");
+        }
+        if (n) {
+            return res.status(406).json("Usuario ya existente");
         }
         if (req.body.nombreUsuario === null || req.body.nombreUsuario === undefined) {
             return res.status(406).json("Nombre de usuario inválido");
@@ -99,13 +103,18 @@ async function midLogin(req, res, next) {
 }
 
 async function midSuspendido(req, res, next) {
-    const u = await Usuario.findOne({ nombreUsuario: req.body.nombreUsuario });
-    if (u.suspendido === true) {
-        res.status(401).json(`Usted está suspendido`);
-    } else {
-        return next();
+    try {
+        const u = await Usuario.findOne({ nombreUsuario: req.body.nombreUsuario });
+        if (u.suspendido === true) {
+            res.status(401).json(`Usted está suspendido`);
+        } else {
+            return next();
+        }
+
+    } catch {
+        res.status(404).json(`Error al validar suspensión del usuario`)
     }
-}
+} 
 
 module.exports = {
     authAdmin,
