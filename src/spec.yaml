@@ -6,6 +6,12 @@ info:
 servers:
   - url: http://localhost:3000/api/v1
     description: development server
+components:
+  securitySchemes:
+    bearerAuth: 
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
 tags:
   - name: "usuarios"
     description: operaciones de los usuarios
@@ -18,16 +24,12 @@ tags:
 paths:
   /usuarios:
     get:
+      security:
+        - bearerAuth: []  
       tags:
       - "usuarios"
       summary: Listado de todos los usuarios
       parameters:
-        - name: authorization
-          in: header
-          required: true
-          description: Token del usuario
-          schema:
-            type : string
         - name: userid
           in: header
           required: true
@@ -66,6 +68,8 @@ paths:
           description: Elemento Invalido
   /logout:
     post:
+      security:
+        - bearerAuth: []       
       tags:
       - "usuarios"
       summary: Logout
@@ -127,6 +131,8 @@ paths:
           description: Elemento Invalido
   /usuarios/{idUsuario}:
     post:
+      security:
+        - bearerAuth: []       
       tags:
       - "usuarios"
       summary: Suspender al usuario
@@ -154,6 +160,8 @@ paths:
         '405':
           description: Elemento Invalido
     get:
+      security:
+        - bearerAuth: []       
       tags:
       - "usuarios"
       summary: Listado del historial del usuario
@@ -182,6 +190,8 @@ paths:
           description: Elemento Invalido
   /pedidos:
     get:
+      security:
+        - bearerAuth: []       
       tags:
       - "pedidos"
       summary: Listado de todos los pedidos
@@ -201,6 +211,8 @@ paths:
         '405':
           description: Elemento Invalido
     post:
+      security:
+        - bearerAuth: []       
       tags:
       - "pedidos"
       summary: Crear Pedido
@@ -221,6 +233,8 @@ paths:
           description: Elemento Invalido
   /pedidos/{idPedido}:
     post:
+      security:
+        - bearerAuth: []       
       tags:
       - "pedidos"
       summary: Pagar Pedido
@@ -259,6 +273,8 @@ paths:
         '405':
           description: Elemento Invalido
     put:
+      security:
+        - bearerAuth: []       
       tags:
       - "pedidos"
       summary: Modificar Pedido
@@ -297,34 +313,38 @@ paths:
         '405':
           description: Elemento Invalido
     delete:
-        tags:
+      security:
+        - bearerAuth: []       
+      tags:
         - "pedidos"
-        summary: Eliminar Pedido
-        parameters:
-          - name: userid
-            in: header
-            required: true
-            description: Id del usuario
-            schema:
-              type : integer
-              format: int64
-              minimum: 1
-          - name: idPedido
-            in: path
-            required: true
-            description: Id del pedido
-            schema:
-              type : integer
-              format: int64
-              minimum: 1
-        description: Elimina un pedido
-        responses:
+      summary: Eliminar Pedido
+      parameters:
+        - name: userid
+          in: header
+          required: true
+          description: Id del usuario
+          schema:
+             type : integer
+             format: int64
+             minimum: 1
+        - name: idPedido
+          in: path
+          required: true
+          description: Id del pedido
+          schema:
+             type : integer
+             format: int64
+             minimum: 1
+      description: Elimina un pedido
+      responses:
           '200':
             description: Ok
           '405':
             description: Elemento Invalido
   /pedidos/{idPedido}/{idProducto}:
     post:
+      security:
+        - bearerAuth: []       
       tags:
         - "pedidos"
       summary: Agrega un producto al pedido
@@ -371,6 +391,8 @@ paths:
         '405':
           description: Elemento Invalido
     delete:
+      security:
+        - bearerAuth: []       
       tags:
         - "pedidos"
       summary: Elimina un producto del pedido
@@ -406,6 +428,8 @@ paths:
         '405':
           description: Elemento Invalido    
     put:
+      security:
+        - bearerAuth: []       
       tags:
         - "pedidos"
       summary: Modifica un producto del pedido
@@ -453,6 +477,8 @@ paths:
           description: Elemento Invalido
   /productos:
     get:
+      security:
+        - bearerAuth: []       
       tags:
       - "productos"
       summary: Listado de todos los productos
@@ -472,10 +498,12 @@ paths:
         '405':
           description: Elemento Invalido
     post:
-        tags:
+      security:
+        - bearerAuth: []       
+      tags:
         - "productos"
-        summary: Crear producto
-        parameters:
+      summary: Crear producto
+      parameters:
           - name: userid
             in: header
             required: true
@@ -484,7 +512,7 @@ paths:
               type : integer
               format: int64
               minimum: 1
-        requestBody:
+      requestBody:
           required: true
           content:
             application/json:
@@ -499,18 +527,20 @@ paths:
                     type: string
                   descripcion:
                     type: string
-        description: Crea un producto
-        responses:
+      description: Crea un producto
+      responses:
           '200':
             description: Ok
           '405':
             description: Elemento Invalido
   /productos/{idProducto}:  
     put:
-        tags:
+      security:
+        - bearerAuth: []       
+      tags:
         - "productos"
-        summary: Modificar producto
-        parameters:
+      summary: Modificar producto
+      parameters:
           - name: userid
             in: header
             required: true
@@ -527,7 +557,7 @@ paths:
               type : integer
               format: int64
               minimum: 1
-        requestBody:
+      requestBody:
           required: true
           content:
             application/json:
@@ -542,17 +572,19 @@ paths:
                     type: string
                   descripcion:
                     type: string
-        description: Modifica un producto
-        responses:
+      description: Modifica un producto
+      responses:
           '200':
             description: Ok
           '405':
             description: Elemento Invalido
     delete:
-        tags:
+      security:
+        - bearerAuth: []       
+      tags:
         - "productos"
-        summary: Eliminar producto
-        parameters:
+      summary: Eliminar producto
+      parameters:
           - name: userid
             in: header
             required: true
@@ -569,14 +601,16 @@ paths:
               type : integer
               format: int64
               minimum: 1
-        description: Elimina un producto
-        responses:
+      description: Elimina un producto
+      responses:
           '200':
             description: Ok
           '405':
             description: Elemento Invalido
   /mediosdepago:
     get:
+      security:
+        - bearerAuth: []       
       tags:
       - "pagos"
       summary: Listado de todos los medios de pago
@@ -596,6 +630,8 @@ paths:
         '405':
           description: Elemento Invalido
     post:
+      security:
+        - bearerAuth: []       
       tags:
       - "pagos"
       summary: Crea un nuevo medio de pago
@@ -625,6 +661,8 @@ paths:
           description: Elemento Invalido
   /mediosdepago/{idPago}:  
     delete:
+      security:
+        - bearerAuth: []       
       tags:
       - "pagos"
       summary: Elimina un medio de pago
@@ -652,6 +690,8 @@ paths:
         '405':
           description: Elemento Invalido
     put:
+      security:
+        - bearerAuth: []       
       tags:
       - "pagos"
       summary: Modifica un medio de pago

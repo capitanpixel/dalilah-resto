@@ -1,13 +1,17 @@
-
 let chai = require('chai');
 let chaiHttp = require('chai-http');
 const expect = require('chai').expect;
+const {Usuario} = require('../src/database/models/usuarios');
 
 chai.use(chaiHttp);
 const url = 'http://localhost:3000/api/v1';
 
+describe('Registrar un usuario: ', () => {
 
-describe('Registrar un usuario', () => {
+    after(() => {
+        Usuario.deleteOne({ nombreUsuario: "nombre"});
+    });
+
     it('debería registrar un usuario con status 200', (done) => {
         chai.request(url)
             .post('/register')
