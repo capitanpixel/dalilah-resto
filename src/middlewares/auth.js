@@ -50,38 +50,37 @@ async function authRegistro(req, res, next) {
         const u = await Usuario.findOne({ email: req.body.email });
         const n = await Usuario.findOne({ email: req.body.nombreUsuario });
         if (u) {
-            return res.status(406).json("Email ya existente");
+            return res.status(400).json("Email ya existente");
         }
         if (n) {
-            return res.status(406).json("Usuario ya existente");
+            return res.status(400).json("Usuario ya existente");
         }
         if (req.body.nombreUsuario === null || req.body.nombreUsuario === undefined) {
-            return res.status(406).json("Nombre de usuario inválido");
+            return res.status(400).json("Nombre de usuario inválido");
         } else if (req.body.nombreApellido === null || req.body.nombreApellido === undefined) {
-            return res.status(406).json("Nombre y apellido inválidos");
+            return res.status(400).json("Nombre y apellido inválidos");
         } else if (req.body.email === null || req.body.email === undefined) {
-            return res.status(406).json("Email inválido");
+            return res.status(400).json("Email inválido");
         } else if (req.body.telefono === null || req.body.telefono === undefined) {
-            return res.status(406).json("Teléfono inválido");
+            return res.status(400).json("Teléfono inválido");
         } else if (req.body.direccion1 === null || req.body.direccion1 === undefined) {
-            return res.status(406).json("Direción inválida");
+            return res.status(400).json("Direción inválida");
         } else if (req.body.password === null || req.body.password === undefined) {
-            return res.status(406).json("Contraseña inválida");
+            return res.status(400).json("Contraseña inválida");
         } else {
             return next();
         }
 
-    } catch(e) {
-        console.log(e);
-        res.status(404).json(`Se produjo un error`);
+    } catch {
+        res.status(405).json(`Se produjo un error`);
     }
 }
 
 function authLogin(req, res, next) {
     if (req.body.nombreUsuario === null || req.body.nombreUsuario === undefined) {
-        res.status(406).json("Nombre de usuario inválido");
+        res.status(400).json("Nombre de usuario inválido");
     } else if (req.body.password === null || req.body.password === undefined) {
-        res.status(406).json("Contraseña inválida");
+        res.status(400).json("Contraseña inválida");
     } else {
         return next();
     }
@@ -94,11 +93,11 @@ async function midLogin(req, res, next) {
         if (u.login === true) {
             return next();
         } else {
-            res.status(406).json("Usted debe loguearse");
+            res.status(401).json("Usted debe loguearse");
         }
 
     } catch {
-        res.status(404).json(`Se produjo un error`);
+        res.status(405).json(`Se produjo un error`);
     }
 }
 
@@ -112,7 +111,7 @@ async function midSuspendido(req, res, next) {
         }
 
     } catch {
-        res.status(404).json(`Error al validar suspensión del usuario`)
+        res.status(405).json(`Error al validar suspensión del usuario`)
     }
 } 
 

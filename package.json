@@ -17,10 +17,7 @@
   ],
   "author": "diego seoane",
   "license": "ISC",
-  "bugs": {
-    "url": "https://gitlab.com/diegoseoane/dalilah-resto/issues"
-  },
-  "homepage": "https://gitlab.com/diegoseoane/dalilah-resto#readme",
+  "homepage": "",
   "dependencies": {
     "chai-http": "^4.3.0",
     "crypto-js": "^4.1.1",

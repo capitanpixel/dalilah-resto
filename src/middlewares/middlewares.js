@@ -5,11 +5,11 @@ const { Pago } = require("../database/models/mediosdepago");
 
 function midCrearProducto(req, res, next) {
     if (req.body.precio === null || req.body.precio === undefined) {
-        res.status(406).json("Precio inválido");
+        res.status(400).json("Precio inválido");
     } else if (req.body.nombre === null || req.body.nombre === undefined) {
-        res.status(406).json("Nombre inválido");
+        res.status(400).json("Nombre inválido");
     } else if (req.body.descripcion === null || req.body.descripcion === undefined) {
-        res.status(406).json("Descripción inválida");
+        res.status(400).json("Descripción inválida");
     } else {
         return next();
     }
@@ -22,7 +22,7 @@ async function midIdUsuario(req, res, next) {
             return next();
         }
     }
-    res.status(401).json(`Id de Usuario inválido`);
+    res.status(400).json(`Id de Usuario inválido`);
 }
 
 async function midIdPedido(req, res, next) {
@@ -32,7 +32,7 @@ async function midIdPedido(req, res, next) {
             return next();
         }
     }
-    res.status(401).json(`Id de Pedido inválido`);
+    res.status(400).json(`Id de Pedido inválido`);
 }
 
 async function midIdProducto(req, res, next) {
@@ -42,7 +42,7 @@ async function midIdProducto(req, res, next) {
             return next();
         }
     }
-    res.status(401).json(`Id de Producto inválido`);
+    res.status(400).json(`Id de Producto inválido`);
 }
 
 async function midIdPago(req, res, next) {
@@ -52,7 +52,7 @@ async function midIdPago(req, res, next) {
             return next();
         }
     }
-    res.status(401).json(`Id de Pago inválido`);
+    res.status(400).json(`Id de Pago inválido`);
 }
 
 module.exports = {

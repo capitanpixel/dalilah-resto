@@ -13,7 +13,7 @@ function makePagosRouter() {
             const m = await Pago.find();
             res.status(200).json(m);
         } catch {
-            res.status(404).json(`Error al cargar los medios de pago`);
+            res.status(400).json(`Error al cargar los medios de pago`);
         }
     })
 
@@ -21,7 +21,7 @@ function makePagosRouter() {
     router.post("/mediosdepago", authAdmin, async (req, res) => {
         try {
             if (req.body.nombre === null || req.body.nombre === undefined) {
-                res.status(401).json("Ingrese nombre de medio de pago");
+                res.status(400).json("Ingrese nombre de medio de pago");
             } else {
                 const m = await Pago.find();
                 const nuevoPago = await new Pago();
@@ -35,7 +35,7 @@ function makePagosRouter() {
                 res.status(200).json(`El medio de pago ${nuevoPago.nombre} ha sido agregado`);
             }
         } catch {
-            res.status(404).json(`Error al cargar el medio de pago`);
+            res.status(400).json(`Error al cargar el medio de pago`);
         }
     })
 
@@ -43,7 +43,7 @@ function makePagosRouter() {
     router.put("/mediosdepago/:idPago", authAdmin, midIdPago, async (req, res) => {
         try {
             if (req.body.nombre === null || req.body.nombre === undefined) {
-                res.status(401).json("Ingrese nombre de medio de pago");
+                res.status(400).json("Ingrese nombre de medio de pago");
             } else {
                 const idPago = Number(req.params.idPago);
                 const p = await Pago.findOne({ id: idPago });
@@ -52,7 +52,7 @@ function makePagosRouter() {
                 res.status(200).json(`El medio de pago ${p.nombre} ha sido modificado`);
             }
         } catch {
-            res.status(404).json(`Error al modificar medio de pago`);
+            res.status(400).json(`Error al modificar medio de pago`);
         }
     })
 
@@ -63,7 +63,7 @@ function makePagosRouter() {
             await Pago.deleteOne({ id: idPago });
             res.status(200).json(`El medio de pago ha sido eliminado`);
         } catch {
-            res.status(404).json(`Error al eliminar medio de pago`);
+            res.status(400).json(`Error al eliminar medio de pago`);
         }
     })
 

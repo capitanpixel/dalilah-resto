@@ -35,9 +35,8 @@ function makeUsuariosRouter() {
             nuevoUsuario.suspendido = false;
             await nuevoUsuario.save();
             res.status(200).json(`Usuario ${nuevoUsuario.nombreUsuario} registrado con exito`);
-        } catch(e) {
-            console.log(e);
-            res.status(404).json(`Error al registrar usuario`);
+        } catch {
+            res.status(400).json(`Error al registrar usuario`);
         }
     })
     // login usuario
@@ -53,10 +52,10 @@ function makeUsuariosRouter() {
                     Token: token
                 })
             } else {
-                res.status(404).json(`Contraseña invalida`);
+                res.status(400).json(`Contraseña invalida`);
             }
         } catch {
-            res.status(404).json(`Error al loguearse`);
+            res.status(400).json(`Error al loguearse`);
         }
 
     })
@@ -68,8 +67,7 @@ function makeUsuariosRouter() {
             u.login = false;
             u.save();
             res.status(200).json(`Usuario ${u.nombreUsuario} ha cerrado sesión`);
-        } catch(e) {
-            console.log(e);
+        } catch {
             res.status(404).json(`Error al cerrar sesión`);
         }
     })
@@ -84,7 +82,17 @@ function makeUsuariosRouter() {
             u.save();
             res.status(200).json(`El estado de suspensión de ${u.nombreUsuario} ha sido modificado a ${u.suspendido}`);
         } catch {
-            res.status(404).json(`Error al suspender usuario`);
+            res.status(400).json(`Error al suspender usuario`);
+        }
+    })
+
+    router.delete("/usuarios/:idUsuario", midLogin, async (req, res) => {
+        try {
+            const usuarioId = Number(req.params.idUsuario);
+            await Usuario.deleteOne({ id: usuarioId });
+            res.status(200).json(`Usuario eliminado`);
+        } catch {
+            res.status(400).json(`Error al eliminar usuario`);
         }
     })
 
@@ -94,7 +102,7 @@ function makeUsuariosRouter() {
             const u = await Usuario.find();
             res.status(200).json(u);
         } catch {
-            res.status(404).json(`Error al cargar los usuarios`);
+            res.status(400).json(`Error al cargar los usuarios`);
         }
     })
 
@@ -105,7 +113,7 @@ function makeUsuariosRouter() {
             const p = await Pedido.find({ usuarioId: usuarioId });
             res.status(200).json(p)
         } catch {
-            res.status(404).json(`No se ha podido cargar el historial del usuario`)
+            res.status(400).json(`No se ha podido cargar el historial del usuario`)
         }
     })
 

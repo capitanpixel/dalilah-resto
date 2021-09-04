@@ -66,7 +66,7 @@ function makeProductosRouter() {
             client.set("productos", JSON.stringify(productos));
             res.status(200).json(`El producto ${p.nombre} ha sido modificado`);
         } catch {
-            res.status(404).json(`Error al modificar el producto`);
+            res.status(400).json(`Error al modificar el producto`);
         }
     })
 
@@ -79,7 +79,7 @@ function makeProductosRouter() {
             client.set("productos", JSON.stringify(productos));
             res.status(200).json(`El producto ha sido eliminado`);
         } catch {
-            res.status(404).json(`No se ha podido eliminar el producto`);
+            res.status(400).json(`No se ha podido eliminar el producto`);
         }
     })
 

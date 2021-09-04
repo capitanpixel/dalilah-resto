@@ -19,6 +19,8 @@ npm i helmet
 npm i jsonwebtoken
 npm i redis
 npm i mocha
+npm i chai
+npm i chai-http
 ~~~
 y hacerla correr con: 
 ~~~

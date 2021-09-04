@@ -29,7 +29,7 @@ function makePedidosRouter() {
             await nuevoPedido.save();
             res.status(200).json(`Pedido ${nuevoPedido.id} creado por el usuario ${nuevoPedido.usuarioId}`);
         } catch {
-            res.status(401).json(`El pedido no ha podido guardarse`);
+            res.status(400).json(`El pedido no ha podido guardarse`);
         }
     })
 
@@ -54,16 +54,16 @@ function makePedidosRouter() {
                     res.status(200).json(`El pedido ${p.id} ha sido abonado`);
                 } else {
                     await session.abortTransaction();
-                    res.status(404).json(`El pedido ${p.id} ya ha sido abonado anteriormente.`);
+                    res.status(405).json(`El pedido ${p.id} ya ha sido abonado anteriormente.`);
                 }
             } else {
                 await session.abortTransaction();
-                res.status(404).json(`El pedido ${pedido.id} no corresponde al usuario ${u.nombreUsuario}`);
+                res.status(401).json(`El pedido ${pedido.id} no corresponde al usuario ${u.nombreUsuario}`);
             }
             session.endSession();
         } catch (error) {
             console.log(error);
-            res.status(404).json(`El pedido no ha podido ser abonado`);
+            res.status(400).json(`El pedido no ha podido ser abonado`);
         }
     })
 
@@ -91,17 +91,16 @@ function makePedidosRouter() {
                     res.status(200).json(`Producto ${producto.nombre} (cantidad: ${productoAgregado.cantidad}) agregado al pedido ${pedido.id} por el usuario ${u.nombreUsuario}`);
                 } else {
                     await session.abortTransaction();
-                    res.status(200).json(`El pedido ${pedido.id} ya ha sido abonado y no puede modificarse`)
+                    res.status(400).json(`El pedido ${pedido.id} ya ha sido abonado y no puede modificarse`)
                 }
             } else {
                 await session.abortTransaction();
-                res.status(404).json(`El pedido ${pedido.id} no corresponde al usuario ${u.nombreUsuario}`);
+                res.status(400).json(`El pedido ${pedido.id} no corresponde al usuario ${u.nombreUsuario}`);
             }
             session.endSession();
 
-        } catch (e) {
-            console.log(e);
-            res.status(404).json(`No se pudo agregar el producto`);
+        } catch {
+            res.status(400).json(`No se pudo agregar el producto`);
         }
     })
 
@@ -131,16 +130,15 @@ function makePedidosRouter() {
                     }
                 } else {
                     await session.abortTransaction();
-                    res.status(200).json(`El pedido ${pedido.id} ya ha sido abonado y no puede modificarse`);
+                    res.status(400).json(`El pedido ${pedido.id} ya ha sido abonado y no puede modificarse`);
                 }
             } else {
                 await session.abortTransaction();
-                res.status(404).json(`El pedido ${pedido.id} no corresponde al usuario ${u.nombreUsuario}`);
+                res.status(400).json(`El pedido ${pedido.id} no corresponde al usuario ${u.nombreUsuario}`);
             }
             session.endSession();
-        } catch (e) {
-            console.log(e);
-            res.status(404).json(`No se pudo quitar el producto`);
+        } catch {
+            res.status(400).json(`No se pudo quitar el producto`);
         }
     })
 
@@ -180,12 +178,12 @@ function makePedidosRouter() {
                 }
             } else {
                 await session.abortTransaction();
-                res.status(404).json(`El pedido ${pedido.id} no corresponde al usuario ${u.nombreUsuario}`);
+                res.status(400).json(`El pedido ${pedido.id} no corresponde al usuario ${u.nombreUsuario}`);
             }
             session.endSession();
         } catch (e) {
             console.log(e);
-            res.status(404).json(`No se pudo modificar el producto`);
+            res.status(400).json(`No se pudo modificar el producto`);
         }
     })
 
@@ -195,7 +193,7 @@ function makePedidosRouter() {
             const p = await Pedido.find();
             res.status(200).json(p);
         } catch {
-            res.status(404).json(`No pudieron cargarse los pedidos`);
+            res.status(400).json(`No pudieron cargarse los pedidos`);
         }
     })
 
@@ -209,10 +207,10 @@ function makePedidosRouter() {
                 p.save();
                 res.status(200).json(`El pedido ${p.id} ha sido modificado a estado ${p.estado}`);
             } else {
-                res.status(404).json(`Estado de pedido inválido`);
+                res.status(400).json(`Estado de pedido inválido`);
             }
         } catch {
-            res.status(404).json(`El pedido ${p.id} no ha podido modificarse`);
+            res.status(400).json(`El pedido ${p.id} no ha podido modificarse`);
         }
     })
     // eliminar pedido
@@ -222,7 +220,7 @@ function makePedidosRouter() {
             await Pedido.deleteOne({ id: idPedido });
             res.status(200).json(`El pedido ha sido eliminado`);
         } catch {
-            res.status(404).json(`El pedido no ha podido ser eliminado`);
+            res.status(400).json(`El pedido no ha podido ser eliminado`);
         }
     })
     return router;
