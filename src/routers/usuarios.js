@@ -22,7 +22,7 @@ function makeUsuariosRouter() {
             nuevoUsuario.nombreUsuario = req.body.nombreUsuario;
             nuevoUsuario.nombreApellido = req.body.nombreApellido;
             nuevoUsuario.telefono = req.body.telefono;
-            nuevoUsuario.email = req.body.email,
+            nuevoUsuario.email = req.body.email;
             nuevoUsuario.password = encript(req.body.password);
             nuevoUsuario.agenda.push(req.body.direccion1);
             if (req.body.direccion2) {
@@ -86,10 +86,22 @@ function makeUsuariosRouter() {
             res.status(400).json(`Error al suspender usuario`);
         }
     })
-    // eliminar usuario
-    router.delete("/usuarios/:nombre", /*authAdmin,*/ async (req, res) => {
+
+    // eliminar usuario de prueba
+    router.delete("/usuarios/nombre", async (req, res) => {
         try {
-            await Usuario.deleteOne({ nombreUsuario: req.params.nombre });
+            await Usuario.deleteOne({ nombreUsuario: "nombre" });
+            res.status(200).json(`Usuario eliminado`);
+        } catch {
+            res.status(400).json(`Error al eliminar usuario`);
+        }
+    })
+    
+    // eliminar usuario
+    router.delete("/usuarios/:idUsuario", authAdmin, async (req, res) => {
+        try {
+            const usuarioId = Number(req.params.idUsuario);
+            await Usuario.deleteOne({ id: usuarioId });
             res.status(200).json(`Usuario eliminado`);
         } catch {
             res.status(400).json(`Error al eliminar usuario`);

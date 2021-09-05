@@ -8,10 +8,9 @@ const url = 'http://localhost:3000/api/v1';
 describe('Registrar un usuario: ', () => {
 
     it('debería registrar un usuario con status 200', (done) => {
-
         chai.request(url)
             .post('/register')
-            .send({ id: 0, nombreUsuario: "nombre", nombreApellido: "Juan Pruebas", telefono: "444444", email: "email", password: "password123", direccion1: "direccion1" })
+            .send({ nombreUsuario: "nombre", nombreApellido: "Juan Pruebas", telefono: "444444", email: "email", password: "password123", direccion1: "direccion1" })
             .end((err, res) => {
                 expect(err).to.be.null;
                 expect(res).to.have.status(200);
@@ -28,5 +27,4 @@ describe('Registrar un usuario: ', () => {
                 done();
             });
     })
-
 });
