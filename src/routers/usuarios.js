@@ -35,7 +35,8 @@ function makeUsuariosRouter() {
             nuevoUsuario.suspendido = false;
             await nuevoUsuario.save();
             res.status(200).json(`Usuario ${nuevoUsuario.nombreUsuario} registrado con exito`);
-        } catch {
+        } catch(e) {
+            console.log(e);
             res.status(400).json(`Error al registrar usuario`);
         }
     })
@@ -85,11 +86,10 @@ function makeUsuariosRouter() {
             res.status(400).json(`Error al suspender usuario`);
         }
     })
-
-    router.delete("/usuarios/:idUsuario", midLogin, async (req, res) => {
+    // eliminar usuario
+    router.delete("/usuarios/:nombre", /*authAdmin,*/ async (req, res) => {
         try {
-            const usuarioId = Number(req.params.idUsuario);
-            await Usuario.deleteOne({ id: usuarioId });
+            await Usuario.deleteOne({ nombreUsuario: req.params.nombre });
             res.status(200).json(`Usuario eliminado`);
         } catch {
             res.status(400).json(`Error al eliminar usuario`);
@@ -97,7 +97,7 @@ function makeUsuariosRouter() {
     })
 
     // ver usuarios
-    router.get("/usuarios", authAdmin, midLogin, async (req, res) => {
+    router.get("/usuarios", midLogin, async (req, res) => {
         try {
             const u = await Usuario.find();
             res.status(200).json(u);
