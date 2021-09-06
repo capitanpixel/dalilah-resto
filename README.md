@@ -6,6 +6,10 @@ Para su funcionamiento debe tener instalado "node".
 
 Busque en el [Sitio Oficial de Node](https://nodejs.org/es/download/) la mejor opción de acuerdo a su sistema operativo.
 
+## Base de datos
+
+
+## Dependencias
 También debe instalar las siguientes dependencias:
 ~~~
 npm install -g nodemon
