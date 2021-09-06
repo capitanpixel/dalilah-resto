@@ -4,10 +4,13 @@ const { Usuario } = require("../database/models/usuarios");
 const { Pedido } = require("../database/models/pedidos")
 const { midIdUsuario } = require("../middlewares/middlewares");
 const { authLogin, authRegistro, authAdmin, midLogin, encript, midSuspendido, authUser } = require("../middlewares/auth");
+const dotenv = require('dotenv');
 
 function makeUsuariosRouter() {
 
     const router = Router();
+    dotenv.config();
+    const { USER_TEST } = process.env;
 
     // registrar usuario
     router.post("/register", authRegistro, async (req, res) => {
@@ -40,6 +43,7 @@ function makeUsuariosRouter() {
             res.status(400).json(`Error al registrar usuario`);
         }
     })
+
     // login usuario
     router.post("/login", authLogin, midSuspendido, async (req, res) => {
         try {
@@ -60,6 +64,7 @@ function makeUsuariosRouter() {
         }
 
     })
+    
     // logout
     router.post("/logout", authUser, midLogin, async (req, res) => {
         try {
@@ -88,20 +93,9 @@ function makeUsuariosRouter() {
     })
 
     // eliminar usuario de prueba
-    router.delete("/usuarios/nombre", async (req, res) => {
+    router.delete("/usuarios/test", async (req, res) => {
         try {
-            await Usuario.deleteOne({ nombreUsuario: "nombre" });
-            res.status(200).json(`Usuario eliminado`);
-        } catch {
-            res.status(400).json(`Error al eliminar usuario`);
-        }
-    })
-    
-    // eliminar usuario
-    router.delete("/usuarios/:idUsuario", authAdmin, async (req, res) => {
-        try {
-            const usuarioId = Number(req.params.idUsuario);
-            await Usuario.deleteOne({ id: usuarioId });
+            await Usuario.deleteOne({ nombreUsuario: `${USER_TEST}` });
             res.status(200).json(`Usuario eliminado`);
         } catch {
             res.status(400).json(`Error al eliminar usuario`);

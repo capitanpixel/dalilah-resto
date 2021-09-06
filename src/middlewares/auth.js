@@ -109,7 +109,6 @@ async function midSuspendido(req, res, next) {
         } else {
             return next();
         }
-
     } catch {
         res.status(405).json(`Error al validar suspensión del usuario`)
     }
