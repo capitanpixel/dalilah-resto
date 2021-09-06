@@ -1,13 +1,15 @@
 # dalilah-resto
 Aplicación para pedidos y delivery de comidas rápidas. 
 
-## Instalación
+## Instalación de Node
 Para su funcionamiento debe tener instalado "node". 
 
 Busque en el [Sitio Oficial de Node](https://nodejs.org/es/download/) la mejor opción de acuerdo a su sistema operativo.
 
-## Base de datos
+## Conexión con base de datos: Mongo Atlas 
+Ingrese al sitio web de [Mongo Atlas](https://www.mongodb.com/es/cloud/atlas) y siga las instrucciones para generar una base de datos online. Recuerde incluir en un archivo ".env" su nombre de usuario, contraseña y nombre de base de datos.
 
+En el presente repositorio se incluye un "sample.env" como ejemplo. 
 
 ## Dependencias
 También debe instalar las siguientes dependencias:
