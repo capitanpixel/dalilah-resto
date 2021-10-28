@@ -1,14 +1,14 @@
 const mongoose = require("mongoose");
-const dotenv = require("dotenv");
+//const dotenv = require("dotenv");
 
 async function initDatabase() {
 
-    dotenv.config();
-    const DB_USERNAME = process.env.DB_USERNAME;
-    const DB_PASSWORD = process.env.DB_PASSWORD;
-    const DB_DATABASE = process.env.DB_DATABASE;
+   // dotenv.config();
+   // const DB_USERNAME = process.env.DB_USERNAME;
+   // const DB_PASSWORD = process.env.DB_PASSWORD;
+   // const DB_DATABASE = process.env.DB_DATABASE;
 
-    const url = `mongodb+srv://${DB_USERNAME}:${DB_PASSWORD}@dalilah.abewh.mongodb.net/${DB_DATABASE}?retryWrites=true&w=majority`;
+    const url = `mongodb+srv://diego:diego123@acamica.7bjy9.mongodb.net/acamica?retryWrites=true&w=majority`;
     
     const initDB = new Promise((resolve, reject) => {
 

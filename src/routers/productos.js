@@ -4,7 +4,10 @@ const { Producto } = require("../database/models/productos");
 const { midIdProducto } = require("../middlewares/middlewares");
 const { authAdmin } = require("../middlewares/auth");
 
-const client = redis.createClient();
+const client = redis.createClient({
+	host:"redis-dalilahresto.jvmqug.0001.sae1.cache.amazonaws.com",
+	port: 6379,
+});
 client.on("error", function (error) {
     console.error(error);
 })
